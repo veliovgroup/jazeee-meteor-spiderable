@@ -1,4 +1,4 @@
-# spiderable
+# spiderable-longer-timeout
 
 `spiderable` is part of [Webapp](https://www.meteor.com/webapp). It's
 one possible way to allow web search engines to index a Meteor
@@ -26,6 +26,14 @@ either return a cursor (or an array of cursors), or eventually call
 will fail.
 
 ## Notes
+
+This is a branch of the standard meteor spiderable, with some merged code from
+ongoworks:spiderable. Primarily, this lengthens the timeout to 30 seconds and
+size limit to 10MB. In addition, it attempts to deal with the /dev/stdin bug, which
+seems to break phantom on some servers.
+
+In addition, it waits for Iron Router to complete routing.
+You will need to set Meteor.isRouteComplete to true in order to publish.
 
 If you deploy your application with `meteor bundle`, you must install
 `phantomjs` ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your

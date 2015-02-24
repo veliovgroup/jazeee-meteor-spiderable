@@ -11,8 +11,13 @@ var isReady = function () {
     if (typeof Package === 'undefined'
         || Package["jazeee:spiderable-longer-timeout"] === undefined
         || Package["jazeee:spiderable-longer-timeout"].Spiderable === undefined
-        || !Package["jazeee:spiderable-longer-timeout"].Spiderable._initialSubscriptionsStarted) {
+        || !Package["jazeee:spiderable-longer-timeout"].Spiderable._initialSubscriptionsStarted
+        || Meteor.isRouteComplete === undefined 
+        || !Meteor.isRouteComplete ) {
       return false;
+    }
+    if (typeof Tracker === 'undefined' || typeof DDP === 'undefined'){
+        return false;
     }
     Tracker.flush();
     return DDP._allSubscriptionsReady();
