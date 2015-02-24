@@ -9,9 +9,9 @@ var isReady = function () {
       return false;
     }
     if (typeof Package === 'undefined'
-        || Package["jazeee:spiderable"] === undefined
-        || Package["jazeee:spiderable"].Spiderable === undefined
-        || !Package["jazeee:spiderable"].Spiderable._initialSubscriptionsStarted) {
+        || Package["jazeee:spiderable-longer-timeout"] === undefined
+        || Package["jazeee:spiderable-longer-timeout"].Spiderable === undefined
+        || !Package["jazeee:spiderable-longer-timeout"].Spiderable._initialSubscriptionsStarted) {
       return false;
     }
     Tracker.flush();

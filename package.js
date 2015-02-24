@@ -1,9 +1,12 @@
 Package.describe({
-  summary: "Makes the application crawlable to web spiders",
-  version: "1.0.7-winr.3"
+  name: "jazeee:spiderable-longer-timeout",
+  summary: "Makes the application crawlable to web spiders with a longer timeout and no stdin issues",
+  version: "1.0.10",
+  git: "https://github.com/jazeee/jazeee-meteor-spiderable"
 });
 
 Package.onUse(function (api) {
+  api.versionsFrom("METEOR@0.9.0");
   api.use('webapp', 'server');
   api.use(['templating'], 'client');
   api.use(['underscore'], ['client', 'server']);
