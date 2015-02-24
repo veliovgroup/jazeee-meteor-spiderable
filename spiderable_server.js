@@ -17,10 +17,10 @@ Spiderable.userAgentRegExps = [
     /^facebookexternalhit/i, /^linkedinbot/i, /^twitterbot/i];
 
 // how long to let phantomjs run before we kill it
-var REQUEST_TIMEOUT = 10*1000;
+var REQUEST_TIMEOUT = 30*1000;
 // maximum size of result HTML. node's default is 200k which is too
 // small for our docs.
-var MAX_BUFFER = 5*1024*1024; // 5MB
+var MAX_BUFFER = 10*1024*1024; // 10MB
 
 // Exported for tests.
 Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
@@ -114,12 +114,13 @@ WebApp.connectHandlers.use(function (req, res, next) {
       function (error, stdout, stderr) {
         fs.unlink(filename);
         if (!error && /<html/i.test(stdout)) {
-          console.log("Success");
           res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
+          console.log("Spiderable successfully completed for url: ", url);
           res.end(stdout);
         } else {
           // phantomjs failed. Don't send the error, instead send the
           // normal page.
+          console.log("Spiderable failed for url: ", url);
           if (error && error.code === 127)
             Meteor._debug("spiderable: phantomjs not installed. Download and install from http://phantomjs.org/");
           else

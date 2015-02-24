@@ -1,7 +1,7 @@
 Package.describe({
   name: "jazeee:spiderable-longer-timeout",
   summary: "Makes the application crawlable to web spiders with a longer timeout and no stdin issues",
-  version: "1.0.10",
+  version: "1.0.11",
   git: "https://github.com/jazeee/jazeee-meteor-spiderable"
 });
 
