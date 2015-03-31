@@ -2,7 +2,7 @@
 
 Install using
 
-| meteor add jazeee:spiderable-longer-timeout
+> meteor add jazeee:spiderable-longer-timeout
 
 ## From Meteor's original Spiderable documentation. See notes specific to this branch.
 
