@@ -34,8 +34,8 @@ seems to break phantom on some servers.
 
 In addition, it waits for Iron Router to complete routing.
 
-*Important*
-You will need to set *Meteor.isRouteComplete= true* when your route is finished, in order to publish.
+**Important**
+You will need to set **Meteor.isRouteComplete=true** when your route is finished, in order to publish.
 
 I also set Spiderable.originalRequest to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
