@@ -60,6 +60,8 @@ WebApp.connectHandlers.use(function (req, res, next) {
       _.any(Spiderable.userAgentRegExps, function (re) {
         return re.test(req.headers['user-agent']); })) {
 
+    Spiderable.originalRequest = req;
+
     var url = Spiderable._urlForPhantom(Meteor.absoluteUrl(), req.url);
 
     // This string is going to be put into a bash script, so it's important
