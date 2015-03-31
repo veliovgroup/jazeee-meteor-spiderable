@@ -1,5 +1,11 @@
 # spiderable-longer-timeout
 
+Install using
+
+| meteor add jazeee:spiderable-longer-timeout
+
+## From Meteor's original Spiderable documentation. See notes specific to this branch.
+
 `spiderable` is part of [Webapp](https://www.meteor.com/webapp). It's
 one possible way to allow web search engines to index a Meteor
 application. It uses the [AJAX Crawling
