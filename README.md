@@ -31,7 +31,6 @@ If using IronRouter, I recommend that you create a base controller with a functi
 			]
 	)
 
-
 ### Install PhantomJS on your server
 
 If you deploy your application with `meteor bundle`, you must install
