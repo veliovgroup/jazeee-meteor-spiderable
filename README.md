@@ -16,7 +16,7 @@ I added code to wait for a flag to be true, which gives you finer control over w
 
 **Important**
 You will need to set **Meteor.isReadyForSpiderable=true** when your route is finished, in order to publish.
-I am deprecating **Meteor.isRouteComplete=true**, but it will work for a while.
+I am deprecating **Meteor.isRouteComplete=true**, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
 If using IronRouter, I recommend that you create a base controller with a function onAfterAction. You can set Meteor.isReadyForSpiderable=true in that.
