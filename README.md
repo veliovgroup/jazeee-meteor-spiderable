@@ -1,10 +1,51 @@
 # spiderable-longer-timeout
 
+This is a branch of the standard meteor spiderable, with some merged code from
+ongoworks:spiderable. Primarily, this lengthens the timeout to 30 seconds and
+size limit to 10MB. In addition, it attempts to deal with the /dev/stdin bug, which
+seems to break phantom on some servers.
+
 Install using
 
-> meteor add jazeee:spiderable-longer-timeout
+    meteor add jazeee:spiderable-longer-timeout
 
-## From Meteor's original Spiderable documentation. See notes specific to this branch.
+## Things you must do to make it work
+### Set `Meteor.isReadyForSpiderable` Flag
+
+I added code to wait for a flag to be true, which gives you finer control over when you are ready to publish your content.
+
+**Important**
+You will need to set **Meteor.isReadyForSpiderable=true** when your route is finished, in order to publish.
+I am deprecating **Meteor.isRouteComplete=true**, but it will work for a while.
+See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
+
+If using IronRouter, I recommend that you create a base controller with a function onAfterAction. You can set Meteor.isReadyForSpiderable=true in that.
+
+	# Example Coffeescript code
+	BaseController = RouteController.extend(
+		onAfterAction: ->
+			Meteor.isReadyForSpiderable = true
+		waitOn: ->
+			return [
+				Meteor.subscribe('someCollectionThatAffectsRenderingPerhaps')
+			]
+	)
+
+
+### Install PhantomJS on your server
+
+If you deploy your application with `meteor bundle`, you must install
+phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
+`$PATH`. If you use Meteor Up, then `meteor deploy` will do this for you.
+
+I also set Spiderable.originalRequest to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
+
+### Testing
+
+You can test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
+
+
+## From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 
 `spiderable` is part of [Webapp](https://www.meteor.com/webapp). It's
 one possible way to allow web search engines to index a Meteor
@@ -31,20 +72,3 @@ either return a cursor (or an array of cursors), or eventually call
 [`this.ready()`](#publish_ready). Otherwise, the `phantomjs` executions
 will fail.
 
-## Notes
-
-This is a branch of the standard meteor spiderable, with some merged code from
-ongoworks:spiderable. Primarily, this lengthens the timeout to 30 seconds and
-size limit to 10MB. In addition, it attempts to deal with the /dev/stdin bug, which
-seems to break phantom on some servers.
-
-In addition, it waits for Iron Router to complete routing.
-
-**Important**
-You will need to set **Meteor.isRouteComplete=true** when your route is finished, in order to publish.
-
-I also set Spiderable.originalRequest to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
-
-If you deploy your application with `meteor bundle`, you must install
-`phantomjs` ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
-`$PATH`. If you use `meteor deploy` this is already taken care of.

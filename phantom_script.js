@@ -11,11 +11,13 @@ var isReady = function () {
     if (typeof Package === 'undefined'
         || Package["jazeee:spiderable-longer-timeout"] === undefined
         || Package["jazeee:spiderable-longer-timeout"].Spiderable === undefined
-        || !Package["jazeee:spiderable-longer-timeout"].Spiderable._initialSubscriptionsStarted
-        || Meteor.isRouteComplete === undefined 
-        || !Meteor.isRouteComplete ) {
+        || !Package["jazeee:spiderable-longer-timeout"].Spiderable._initialSubscriptionsStarted ) {
       return false;
     }
+	if( !(Meteor.isRouteComplete || Meteor.isReadyForSpiderable ) ) {
+		// We only need one of these flags set in order to proceed. I may deprecate Meteor.isRouteComplete
+		return false;
+	}
     if (typeof Tracker === 'undefined' || typeof DDP === 'undefined'){
         return false;
     }
