@@ -15,7 +15,7 @@ var isReady = function () {
       return false;
     }
 	if( !(Meteor.isRouteComplete || Meteor.isReadyForSpiderable ) ) {
-		// We only need one of these flags set in order to proceed. I may deprecate Meteor.isRouteComplete
+		// We only need one of these flags set in order to proceed. I may deprecate Meteor.isRouteComplete after 2015-12-31
 		return false;
 	}
     if (typeof Tracker === 'undefined' || typeof DDP === 'undefined'){
