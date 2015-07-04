@@ -16,6 +16,13 @@ var crypto = Npm.require('crypto');
 Spiderable.userAgentRegExps = [
     /^facebookexternalhit/i, /^linkedinbot/i, /^twitterbot/i];
 
+// list of routes that we want to serve statically, but do
+// not obey the _escaped_fragment_ protocol.
+Spiderable.skipRoutes = [];
+
+// show debug messages in server's console
+Spiderable.debug = true
+
 // how long to let phantomjs run before we kill it
 var REQUEST_TIMEOUT = 30*1000;
 // maximum size of result HTML. node's default is 200k which is too
@@ -56,9 +63,12 @@ var PHANTOM_SCRIPT = Assets.getText("phantom_script.js");
 WebApp.connectHandlers.use(function (req, res, next) {
   // _escaped_fragment_ comes from Google's AJAX crawling spec:
   // https://developers.google.com/webmasters/ajax-crawling/docs/specification
-  if (/\?.*_escaped_fragment_=/.test(req.url) ||
+  if (/\?.*_escaped_fragment_=/.test(req.url) || 
       _.any(Spiderable.userAgentRegExps, function (re) {
-        return re.test(req.headers['user-agent']); })) {
+        return re.test(req.headers['user-agent']); }) &&
+      !_.any(Spiderable.skipRoutes, function (r) {
+        return (req.url.indexOf(r)>-1);
+      })) {
 
     Spiderable.originalRequest = req;
 
@@ -105,7 +115,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
     // work around this with a bash heredoc. (We previous used a "cat |"
     // instead, but that meant we couldn't use exec and had to manage several
     // processes.)
-    var filename = '/tmp/meteor_'+crypto.randomBytes(4).readUInt32LE(0);
+    var filename = '/tmp/meteor_' + crypto.randomBytes(4).readUInt32LE(0);
     fs.writeFileSync(filename, phantomScript);
 
     child_process.execFile(
@@ -117,16 +127,21 @@ WebApp.connectHandlers.use(function (req, res, next) {
         fs.unlink(filename);
         if (!error && /<html/i.test(stdout)) {
           res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
-          console.log("Spiderable successfully completed for url: ", url);
+          if(Spiderable.debug) {
+            console.info("Spiderable successfully completed for url: ", url);
+          }
           res.end(stdout);
         } else {
           // phantomjs failed. Don't send the error, instead send the
           // normal page.
-          console.log("Spiderable failed for url: ", url);
-          if (error && error.code === 127)
+          if(Spiderable.debug) {
+            console.warn("Spiderable failed for url: ", url);
+          }
+          if (error && error.code === 127) {
             Meteor._debug("spiderable: phantomjs not installed. Download and install from http://phantomjs.org/");
-          else
+          } else {
             Meteor._debug("spiderable: phantomjs failed:", error, "\nstderr:", stderr);
+          }
 
           next();
         }

@@ -14,6 +14,43 @@ Install using
 
 I added code to wait for a flag to be true, which gives you finer control over when you are ready to publish your content.
 
+### Optionally set `Spiderable.userAgentRegExps`
+`Spiderable.userAgentRegExps` is array of strings, of bot user agents that we want to serve statically, but do not obey the _escaped_fragment_ protocol.
+```javascript
+Spiderable.userAgentRegExps.push(/^bingbot/i);
+```
+
+Default bots:
+ - `/^facebookexternalhit/i`
+ - `/^linkedinbot/i`
+ - `/^twitterbot/i`
+
+### Optionally set `Spiderable.skipRoutes`
+`Spiderable.skipRoutes` is array of strings, routes that we want to serve statically, but do not obey the _escaped_fragment_ protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
+```javascript
+Spiderable.skipRoutes.push('/cdn/storage/Files/');
+```
+
+### Avoid non-existent Iron-router routes
+Set up catch-all route which renders `Router.options.notFoundTemplate` on client and returns `404` error in server
+```javascript
+Router.route('/(.*)', function() {
+  if (Meteor.isServer) {
+    this.response.writeHead(404, {'Content-Type': 'text/html'});
+    return this.response.end();
+  } else {
+    return this.render(Router.options.notFoundTemplate);
+  }
+});
+```
+
+### Hide server's console messages `Spiderable.debug`
+Set `Spiderable.debug` to `false` to avoid server's console messages
+```javascript
+Spiderable.debug = false
+```
+
+
 **Important**
 You will need to set **Meteor.isReadyForSpiderable=true** when your route is finished, in order to publish.
 I am deprecating **Meteor.isRouteComplete=true**, but it will work until at least 2015-12-31 after which I'll remove it...
