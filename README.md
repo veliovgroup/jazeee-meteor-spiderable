@@ -86,6 +86,13 @@ phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
 ### Testing
 You can test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
 
+#### curl
+`curl` your `localhost` or host name, if you on production, like:
+```shell
+curl http://localhost:3000/?_escaped_fragment_=
+curl http://localhost:3000/ -A googlebot
+```
+
 
 ### From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 
