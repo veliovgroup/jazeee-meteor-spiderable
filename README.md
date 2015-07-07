@@ -69,13 +69,11 @@ See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/m
 If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. You can set `Meteor.isReadyForSpiderable = true` in that.
 
 ```coffeescript
-	BaseController = RouteController.extend
-		onAfterAction: ->
-			Meteor.isReadyForSpiderable = true
-		waitOn: ->
-			return [
-				Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps'
-			]
+BaseController = RouteController.extend
+  onAfterAction: ->
+    Meteor.isReadyForSpiderable = true
+  waitOn: ->
+    [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
 
 ### Install PhantomJS on your server
