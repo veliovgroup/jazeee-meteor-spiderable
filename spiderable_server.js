@@ -14,7 +14,28 @@ var crypto = Npm.require('crypto');
 // the _escaped_fragment_ protocol, so we need to hardcode a list
 // here. I shed a silent tear.
 Spiderable.userAgentRegExps = [
-    /^facebookexternalhit/i, /^linkedinbot/i, /^twitterbot/i];
+    /^facebookExternalHit/i,
+    /^linkedinBot/i,
+    /^twitterBot/i,
+    /^googleBot/i,
+    /^bingBot/i,
+    /^yandex/i,
+    /^google-structured-data-testing-tool/i,
+    /^yahoo/i,
+    /^MJ12Bot/i,
+    /^tweetmemeBot/i,
+    /^baiduSpider/i,
+    /^Mail\.RU_Bot/i,
+    /^ahrefsBot/i,
+    /^SiteLockSpider/i
+  ];
+
+// list of routes that we want to serve statically, but do
+// not obey the _escaped_fragment_ protocol.
+Spiderable.ignoredRoutes = [];
+
+// show debug messages in server's console
+Spiderable.debug = true
 
 // how long to let phantomjs run before we kill it
 var REQUEST_TIMEOUT = 30*1000;
@@ -38,8 +59,7 @@ Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
   if (parsedUrl.pathname.charAt(0) === "/") {
     parsedUrl.pathname = parsedUrl.pathname.substring(1);
   }
-  parsedAbsoluteUrl.pathname = urlParser.resolve(parsedAbsoluteUrl.pathname,
-                                                 parsedUrl.pathname);
+  parsedAbsoluteUrl.pathname = urlParser.resolve(parsedAbsoluteUrl.pathname, parsedUrl.pathname);
   parsedAbsoluteUrl.query = parsedQuery;
   // `url.format` will only use `query` if `search` is absent
   parsedAbsoluteUrl.search = null;
@@ -56,9 +76,12 @@ var PHANTOM_SCRIPT = Assets.getText("phantom_script.js");
 WebApp.connectHandlers.use(function (req, res, next) {
   // _escaped_fragment_ comes from Google's AJAX crawling spec:
   // https://developers.google.com/webmasters/ajax-crawling/docs/specification
-  if (/\?.*_escaped_fragment_=/.test(req.url) ||
+  if (/\?.*_escaped_fragment_=/.test(req.url) || 
       _.any(Spiderable.userAgentRegExps, function (re) {
-        return re.test(req.headers['user-agent']); })) {
+        return re.test(req.headers['user-agent']); }) &&
+      !_.any(Spiderable.ignoredRoutes, function (route) {
+        return (req.url.indexOf(route)>-1);
+      })) {
 
     Spiderable.originalRequest = req;
 
@@ -70,8 +93,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
     // exploiting phantomjs, and since the output of JSON.stringify shouldn't
     // be able to contain newlines, it should be unable to exploit bash as
     // well.
-    var phantomScript = "var url = " + JSON.stringify(url) + ";" +
-          PHANTOM_SCRIPT;
+    var phantomScript = "var url = " + JSON.stringify(url) + ";" + PHANTOM_SCRIPT;
 
     // Allow override of phantomjs args via env var
     // We use one env var to try to keep env-var explosion under control.
@@ -105,7 +127,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
     // work around this with a bash heredoc. (We previous used a "cat |"
     // instead, but that meant we couldn't use exec and had to manage several
     // processes.)
-    var filename = '/tmp/meteor_'+crypto.randomBytes(4).readUInt32LE(0);
+    var filename = '/tmp/meteor_' + crypto.randomBytes(4).readUInt32LE(0);
     fs.writeFileSync(filename, phantomScript);
 
     child_process.execFile(
@@ -117,16 +139,21 @@ WebApp.connectHandlers.use(function (req, res, next) {
         fs.unlink(filename);
         if (!error && /<html/i.test(stdout)) {
           res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
-          console.log("Spiderable successfully completed for url: ", url);
+          if(Spiderable.debug) {
+            console.info("Spiderable successfully completed for url: ", url);
+          }
           res.end(stdout);
         } else {
           // phantomjs failed. Don't send the error, instead send the
           // normal page.
-          console.log("Spiderable failed for url: ", url);
-          if (error && error.code === 127)
+          if(Spiderable.debug) {
+            console.warn("Spiderable failed for url: ", url);
+          }
+          if (error && error.code === 127) {
             Meteor._debug("spiderable: phantomjs not installed. Download and install from http://phantomjs.org/");
-          else
+          } else {
             Meteor._debug("spiderable: phantomjs failed:", error, "\nstderr:", stderr);
+          }
 
           next();
         }
