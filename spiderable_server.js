@@ -66,8 +66,8 @@ WebApp.connectHandlers.use(function (req, res, next) {
   if (/\?.*_escaped_fragment_=/.test(req.url) || 
       _.any(Spiderable.userAgentRegExps, function (re) {
         return re.test(req.headers['user-agent']); }) &&
-      !_.any(Spiderable.skipRoutes, function (r) {
-        return (req.url.indexOf(r)>-1);
+      !_.any(Spiderable.skipRoutes, function (route) {
+        return (req.url.indexOf(route)>-1);
       })) {
 
     Spiderable.originalRequest = req;
