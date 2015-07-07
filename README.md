@@ -1,87 +1,95 @@
-# spiderable-longer-timeout
+spiderable-longer-timeout
+====
 
 This is a branch of the standard meteor spiderable, with some merged code from
 ongoworks:spiderable. Primarily, this lengthens the timeout to 30 seconds and
 size limit to 10MB. In addition, it attempts to deal with the /dev/stdin bug, which
 seems to break phantom on some servers.
 
-Install using
-
-    meteor add jazeee:spiderable-longer-timeout
-
-## Things you must do to make it work
-### Set `Meteor.isReadyForSpiderable` Flag
-
-I added code to wait for a flag to be true, which gives you finer control over when you are ready to publish your content.
-
-### Optionally set `Spiderable.userAgentRegExps`
-`Spiderable.userAgentRegExps` is array of strings, of bot user agents that we want to serve statically, but do not obey the _escaped_fragment_ protocol.
-```javascript
-Spiderable.userAgentRegExps.push(/^bingbot/i);
+### Install using
+```shell
+meteor add jazeee:spiderable-longer-timeout
 ```
 
-Default bots:
- - `/^facebookexternalhit/i`
- - `/^linkedinbot/i`
- - `/^twitterbot/i`
+### Things you must do to make it work
+#### Set `Meteor.isReadyForSpiderable` Flag
+Code will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
 
-### Optionally set `Spiderable.skipRoutes`
-`Spiderable.skipRoutes` is array of strings, routes that we want to serve statically, but do not obey the _escaped_fragment_ protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
-```javascript
-Spiderable.skipRoutes.push('/cdn/storage/Files/');
+#### Optionally set `Spiderable.userAgentRegExps`
+`Spiderable.userAgentRegExps` is array of strings, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
+```coffeescript
+Spiderable.userAgentRegExps.push /^vkShare/i
 ```
 
-### Avoid non-existent Iron-router routes
-Set up catch-all route which renders `Router.options.notFoundTemplate` on client and returns `404` error in server
-```javascript
-Router.route('/(.*)', function() {
-  if (Meteor.isServer) {
-    this.response.writeHead(404, {'Content-Type': 'text/html'});
-    return this.response.end();
-  } else {
-    return this.render(Router.options.notFoundTemplate);
-  }
-});
+#####Default bots:
+ - `/^facebookExternalHit/i`
+ - `/^linkedinBot/i`
+ - `/^twitterBot/i`
+ - `/^googleBot/i`
+ - `/^bingBot/i`
+ - `/^yandex/i`
+ - `/^google-structured-data-testing-tool/i`
+ - `/^yahoo/i`
+ - `/^MJ12Bot/i`
+ - `/^tweetmemeBot/i`
+ - `/^baiduSpider/i`
+ - `/^Mail\.RU_Bot/i`
+ - `/^ahrefsBot/i`
+ - `/^SiteLockSpider/`
+
+#### Optionally set `Spiderable.ignoredRoutes`
+`Spiderable.ignoredRoutes` is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
+```coffeescript
+Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
 
-### Hide server's console messages `Spiderable.debug`
+#### If you're using Iron-Router
+To avoid non-existent Iron-Router routes - create catch-all route, which renders `Router.options.notFoundTemplate` on client and returns `404` error on server. Find out more about Iron-router and `notFoundTemplate` in [official docs](http://iron-meteor.github.io/iron-router/#applying-plugins-to-specific-routes).
+```coffeescript
+Router.route '/(.*)', ->
+  if Meteor.isServer
+    @response.writeHead 404, 'Content-Type': 'text/html'
+    return @response.end()
+  else
+    return @render Router.options.notFoundTemplate
+```
+
+#### Hide server's console messages, set `Spiderable.debug`
 Set `Spiderable.debug` to `false` to avoid server's console messages
-```javascript
+```coffeescript
 Spiderable.debug = false
 ```
 
 
-**Important**
-You will need to set **Meteor.isReadyForSpiderable=true** when your route is finished, in order to publish.
-I am deprecating **Meteor.isRouteComplete=true**, but it will work until at least 2015-12-31 after which I'll remove it...
+### **Important**
+You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is finished, in order to publish.
+I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
-If using IronRouter, I recommend that you create a base controller with a function onAfterAction. You can set Meteor.isReadyForSpiderable=true in that.
+If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. You can set `Meteor.isReadyForSpiderable = true` in that.
 
-	# Example Coffeescript code
-	BaseController = RouteController.extend(
+```coffeescript
+	BaseController = RouteController.extend
 		onAfterAction: ->
 			Meteor.isReadyForSpiderable = true
 		waitOn: ->
 			return [
-				Meteor.subscribe('someCollectionThatAffectsRenderingPerhaps')
+				Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps'
 			]
-	)
+```
 
 ### Install PhantomJS on your server
-
 If you deploy your application with `meteor bundle`, you must install
 phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
 `$PATH`. If you use Meteor Up, then `meteor deploy` will do this for you.
 
-I also set Spiderable.originalRequest to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
+`Spiderable.originalRequest` is also set to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
 ### Testing
-
 You can test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
 
 
-## From Meteor's original Spiderable documentation. See notes specific to this branch (above).
+### From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 
 `spiderable` is part of [Webapp](https://www.meteor.com/webapp). It's
 one possible way to allow web search engines to index a Meteor

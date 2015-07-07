@@ -14,11 +14,25 @@ var crypto = Npm.require('crypto');
 // the _escaped_fragment_ protocol, so we need to hardcode a list
 // here. I shed a silent tear.
 Spiderable.userAgentRegExps = [
-    /^facebookexternalhit/i, /^linkedinbot/i, /^twitterbot/i];
+    /^facebookExternalHit/i,
+    /^linkedinBot/i,
+    /^twitterBot/i,
+    /^googleBot/i,
+    /^bingBot/i,
+    /^yandex/i,
+    /^google-structured-data-testing-tool/i,
+    /^yahoo/i,
+    /^MJ12Bot/i,
+    /^tweetmemeBot/i,
+    /^baiduSpider/i,
+    /^Mail\.RU_Bot/i,
+    /^ahrefsBot/i,
+    /^SiteLockSpider/i
+  ];
 
 // list of routes that we want to serve statically, but do
 // not obey the _escaped_fragment_ protocol.
-Spiderable.skipRoutes = [];
+Spiderable.ignoredRoutes = [];
 
 // show debug messages in server's console
 Spiderable.debug = true
@@ -45,8 +59,7 @@ Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
   if (parsedUrl.pathname.charAt(0) === "/") {
     parsedUrl.pathname = parsedUrl.pathname.substring(1);
   }
-  parsedAbsoluteUrl.pathname = urlParser.resolve(parsedAbsoluteUrl.pathname,
-                                                 parsedUrl.pathname);
+  parsedAbsoluteUrl.pathname = urlParser.resolve(parsedAbsoluteUrl.pathname, parsedUrl.pathname);
   parsedAbsoluteUrl.query = parsedQuery;
   // `url.format` will only use `query` if `search` is absent
   parsedAbsoluteUrl.search = null;
@@ -66,7 +79,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
   if (/\?.*_escaped_fragment_=/.test(req.url) || 
       _.any(Spiderable.userAgentRegExps, function (re) {
         return re.test(req.headers['user-agent']); }) &&
-      !_.any(Spiderable.skipRoutes, function (route) {
+      !_.any(Spiderable.ignoredRoutes, function (route) {
         return (req.url.indexOf(route)>-1);
       })) {
 
@@ -80,8 +93,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
     // exploiting phantomjs, and since the output of JSON.stringify shouldn't
     // be able to contain newlines, it should be unable to exploit bash as
     // well.
-    var phantomScript = "var url = " + JSON.stringify(url) + ";" +
-          PHANTOM_SCRIPT;
+    var phantomScript = "var url = " + JSON.stringify(url) + ";" + PHANTOM_SCRIPT;
 
     // Allow override of phantomjs args via env var
     // We use one env var to try to keep env-var explosion under control.
