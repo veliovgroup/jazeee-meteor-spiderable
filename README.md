@@ -66,12 +66,14 @@ You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is 
 I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
-If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. You can set `Meteor.isReadyForSpiderable = true` in that.
+If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. Once checking for @isReady() You can set `Meteor.isReadyForSpiderable = true` in that.
 
 ```coffeescript
 BaseController = RouteController.extend
   onAfterAction: ->
-    Meteor.isReadyForSpiderable = true
+    if @ready()
+      # Waits for subscriptions to complete, which means we can render the page.
+      Meteor.isReadyForSpiderable = true
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
