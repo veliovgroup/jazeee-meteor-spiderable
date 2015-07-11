@@ -76,9 +76,10 @@ var PHANTOM_SCRIPT = Assets.getText("phantom_script.js");
 WebApp.connectHandlers.use(function (req, res, next) {
   // _escaped_fragment_ comes from Google's AJAX crawling spec:
   // https://developers.google.com/webmasters/ajax-crawling/docs/specification
-  if (/\?.*_escaped_fragment_=/.test(req.url) || 
+  console.log (req.headers);
+  if ((/\?.*_escaped_fragment_=/.test(req.url) || 
       _.any(Spiderable.userAgentRegExps, function (re) {
-        return re.test(req.headers['user-agent']); }) &&
+        return re.test(req.headers['user-agent']); })) &&
       !_.any(Spiderable.ignoredRoutes, function (route) {
         return (req.url.indexOf(route)>-1);
       })) {
