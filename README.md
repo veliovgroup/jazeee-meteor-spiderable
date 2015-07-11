@@ -71,7 +71,7 @@ If using IronRouter, I recommend that you create a base controller with `onAfter
 ```coffeescript
 BaseController = RouteController.extend
   onAfterAction: ->
-    if @isReady()
+    if @ready()
       # Waits for subscriptions to complete, which means we can render the page.
       Meteor.isReadyForSpiderable = true
   waitOn: ->
