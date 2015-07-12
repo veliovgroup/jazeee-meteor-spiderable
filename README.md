@@ -66,7 +66,10 @@ You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is 
 I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
-If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. Once checking for `@ready()`, you can set `Meteor.isReadyForSpiderable = true` in that.
+####Guidelines
+* Make sure all subscriptions are completed.
+   * If you don't, Meteor may render correctly in local tests, but fail to render correctly on Google, resulting in bad spidering. Unfortunately, this may be intermittent, and hard to discover.
+   * If using IronRouter, create a base controller with `onAfterAction` function. Once checking for `@ready()`, set `Meteor.isReadyForSpiderable = true` in that.
 ```coffeescript
 BaseController = RouteController.extend
   onAfterAction: ->
@@ -76,6 +79,7 @@ BaseController = RouteController.extend
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
+* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See testing below.
 
 ### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
@@ -85,7 +89,7 @@ phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
 `Spiderable.originalRequest` is also set to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
 ### Testing
-You can test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
+Test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
 
 #### curl
 `curl` your `localhost` or host name, if you on production, like:
@@ -94,6 +98,24 @@ curl http://localhost:3000/?_escaped_fragment_=
 curl http://localhost:3000/ -A googlebot
 ```
 
+#### Google Tools: Fetch as Google
+Use `Fetch as Google` tools to scan your site. Tips:
+* Observe your server logs using tail -f or mup logs -f
+* `Fetch as Google` and observe that it takes 3-5 minutes before displaying results.
+   * Use an uncommon URL to help you identify your request in the logs. Consider adding an extra URL query parameter. For example:
+```shell
+# Simple test with test=1 query
+curl "http://localhost:3002/blogs?_escaped_fragment_=&test=1"
+# Set the date in the query, which will show up in Meteor logs, with a unique date.
+TEST=`date "+%Y%m%d-%H%M%S"`;echo $TEST;curl "http://localhost:3002/blogs?_escaped_fragment_=&test=${TEST}"
+```
+   * The tool will not actually hit your server right away.
+   * It appears to provide a simple scan result without the extra `?_escaped_fragment_=` component.
+   * Wait several minutes more. Google appears to request the page, which will show up in your logs as `Spiderable successfully succeeded`.
+   * Search on Google using `site:your.site.com`
+   * Make sure Google lists all relevant pages.
+   * Look at Google's cached version of the pages, to make sure it is fully rendered.
+   * Make sure that Google sees the pages with all data subscriptions complete.
 
 ### From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 
