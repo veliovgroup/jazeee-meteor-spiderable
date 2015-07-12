@@ -109,6 +109,7 @@ curl "http://localhost:3002/blogs?_escaped_fragment_=&test=1"
 # Set the date in the query, which will show up in Meteor logs, with a unique date.
 TEST=`date "+%Y%m%d-%H%M%S"`;echo $TEST;curl "http://localhost:3002/blogs?_escaped_fragment_=&test=${TEST}"
 ```
+* Interpreting `Fetch as Google` results:
    * The tool will not actually hit your server right away.
    * It appears to provide a simple scan result without the extra `?_escaped_fragment_=` component.
    * Wait several minutes more. Google appears to request the page, which will show up in your logs as `Spiderable successfully succeeded`.
