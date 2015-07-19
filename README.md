@@ -16,7 +16,7 @@ meteor add jazeee:spiderable-longer-timeout
 Code will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
 
 #### Optionally set `Spiderable.userAgentRegExps`
-`Spiderable.userAgentRegExps` {*[RegExp]*} is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
+`Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 ```coffeescript
 Spiderable.userAgentRegExps.push /^vkShare/i
 ```
@@ -38,13 +38,13 @@ Spiderable.userAgentRegExps.push /^vkShare/i
  - `/^SiteLockSpider/`
 
 #### Optionally set `Spiderable.ignoredRoutes`
-`Spiderable.ignoredRoutes` {*[String]*} - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
+`Spiderable.ignoredRoutes` __{[*String*]}__ - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
 ```coffeescript
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
 
 #### `Spiderable.query`
-`Spiderable.query` {*Boolean*|*String*} - additional `get` query appended to http request.
+`Spiderable.query` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
 This option may help to build different client's logic for requests from phantomjs and normal users
 
  - If `true` - to request will be appended empty query with key `___isPhantomjs___`
