@@ -12,7 +12,7 @@ meteor add jazeee:spiderable-longer-timeout
 ```
 
 ### Things you must do to make it work
-#### Set `Meteor.isReadyForSpiderable` Flag
+#### Set `Meteor.isReadyForSpiderable` property
 Code will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
 
 #### Optionally set `Spiderable.userAgentRegExps`
