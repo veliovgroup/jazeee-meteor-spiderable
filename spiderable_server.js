@@ -51,6 +51,14 @@ Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
   var escapedFragment = parsedQuery['_escaped_fragment_'];
   delete parsedQuery['_escaped_fragment_'];
 
+  if(Spiderable.query){
+    if(_.isString(Spiderable.query)){
+      parsedQuery[Spiderable.query] = 'true'
+    }else if(_.isBoolean(Spiderable.query) && Spiderable.query === true){
+      parsedQuery["___isPhantomjs___"] = 'true'
+    }
+  }
+
   var parsedAbsoluteUrl = urlParser.parse(siteAbsoluteUrl);
   // If the ROOT_URL contains a path, Meteor strips that path off of the
   // request's URL before we see it. So we concatenate the pathname from
