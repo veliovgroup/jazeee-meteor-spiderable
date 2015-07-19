@@ -47,8 +47,8 @@ Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 `Spiderable.query` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
 This option may help to build different client's logic for requests from phantomjs and normal users
 
- - If `true` - to request will be appended empty query with key `___isPhantomjs___`
- - If `String` - to request will be appended empty query with your custom key `String`
+ - If `true` - to request will be appended query with key `___isPhantomjs___`, and `true` as a value
+ - If `String` - to request will be appended query with your custom key `String`, and `true` as a value
 ```coffeescript
 Spiderable.query = true
 Spiderable.query = '_fromPhantom_'
