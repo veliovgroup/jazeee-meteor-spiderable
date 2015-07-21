@@ -31,7 +31,7 @@ Spiderable.cacheTTL = 3600 # 1 hour in seconds
 To drop TTL index run in Mongo console:
 ```javascript
 db.SpiderableCacheCollection.dropIndex('createdAt_1');
-# or
+/* or */
 db.SpiderableCacheCollection.dropIndexes();
 ```
 
