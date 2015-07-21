@@ -4,6 +4,10 @@ var querystring = Npm.require('querystring');
 var urlParser = Npm.require('url');
 var crypto = Npm.require('crypto');
 
+var bound = Meteor.bindEnvironment(function(callback) {
+  return callback();
+});
+
 // list of bot user agents that we want to serve statically, but do
 // not obey the _escaped_fragment_ protocol. The page is served
 // statically to any client whos user agent matches any of these
@@ -35,7 +39,7 @@ Spiderable.userAgentRegExps = [
 Spiderable.ignoredRoutes = [];
 
 // show debug messages in server's console
-Spiderable.debug = true
+Spiderable.debug = true;
 
 // how long to let phantomjs run before we kill it
 var REQUEST_TIMEOUT = 30*1000;
@@ -53,9 +57,9 @@ Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
 
   if(Spiderable.query){
     if(_.isString(Spiderable.query)){
-      parsedQuery[Spiderable.query] = 'true'
+      parsedQuery[Spiderable.query] = 'true';
     }else if(_.isBoolean(Spiderable.query) && Spiderable.query === true){
-      parsedQuery["___isPhantomjs___"] = 'true'
+      parsedQuery['___isPhantomjs___'] = 'true';
     }
   }
 
@@ -144,27 +148,29 @@ WebApp.connectHandlers.use(function (req, res, next) {
        ("exec phantomjs " + phantomJsArgs + " " + filename)],
       {timeout: REQUEST_TIMEOUT, maxBuffer: MAX_BUFFER},
       function (error, stdout, stderr) {
-        fs.unlink(filename);
-        if (!error && /<html/i.test(stdout)) {
-          res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
-          if(Spiderable.debug) {
-            console.info("Spiderable successfully completed for url: ", url);
-          }
-          res.end(stdout);
-        } else {
-          // phantomjs failed. Don't send the error, instead send the
-          // normal page.
-          if(Spiderable.debug) {
-            console.warn("Spiderable failed for url: ", url);
-          }
-          if (error && error.code === 127) {
-            Meteor._debug("spiderable: phantomjs not installed. Download and install from http://phantomjs.org/");
+        bound(function(){
+          fs.unlink(filename);
+          if (!error && /<html/i.test(stdout)) {
+            res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
+            if(Spiderable.debug) {
+              console.info("Spiderable successfully completed for url: ", url);
+            }
+            res.end(stdout);
           } else {
-            Meteor._debug("spiderable: phantomjs failed:", error, "\nstderr:", stderr);
-          }
+            // phantomjs failed. Don't send the error, instead send the
+            // normal page.
+            if(Spiderable.debug) {
+              console.warn("Spiderable failed for url: ", url);
+            }
+            if (error && error.code === 127) {
+              Meteor._debug("spiderable: phantomjs not installed. Download and install from http://phantomjs.org/");
+            } else {
+              Meteor._debug("spiderable: phantomjs failed:", error, "\nstderr:", stderr);
+            }
 
-          next();
-        }
+            next();
+          }
+        });
       });
   } else {
     next();
