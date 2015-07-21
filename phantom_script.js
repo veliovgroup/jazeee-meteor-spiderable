@@ -1,5 +1,6 @@
-// 'url' is assigned to in a statement before this.
 var page = require('webpage').create();
+var system = require('system');
+var url = system.args[1];
 
 var isReady = function () {
   return page.evaluate(function () {
@@ -34,8 +35,9 @@ var dumpPageContent = function () {
 };
 
 page.open(url, function(status) {
-  if (status === 'fail')
+  if (status === 'fail'){
     phantom.exit();
+  }
 });
 
 setInterval(function() {

@@ -1,10 +1,9 @@
 spiderable-longer-timeout
 ====
 
-This is a branch of the standard meteor spiderable, with some merged code from
-ongoworks:spiderable. Primarily, this lengthens the timeout to 30 seconds and
-size limit to 10MB. In addition, it attempts to deal with the /dev/stdin bug, which
-seems to break phantom on some servers.
+This is a branch of the standard meteor `spiderable` package, with some merged code from
+`ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
+size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (10800 seconds).
 
 ### Install using
 ```shell
@@ -19,6 +18,21 @@ Code will wait for a flag to be `true`, which gives finer control while content 
 `Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 ```coffeescript
 Spiderable.userAgentRegExps.push /^vkShare/i
+```
+
+#### Optionally set `Spiderable.cacheTTL`
+__Note:__ 
+ - Should be set before `Meteor.startup`
+ - Value should be {*Number*} in seconds
+ - Ton set new TTL you need to drop index on `createdAt_1`
+```coffeescript
+Spiderable.cacheTTL = 3600 # 1 hour in seconds
+```
+To drop TTL index run in Mongo console:
+```coffeescript
+db.SpiderableCacheCollection.dropIndex('createdAt_1');
+# or
+db.SpiderableCacheCollection.dropIndexes();
 ```
 
 #####Default bots:
