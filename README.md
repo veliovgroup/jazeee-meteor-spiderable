@@ -24,12 +24,12 @@ Spiderable.userAgentRegExps.push /^vkShare/i
 __Note:__ 
  - Should be set before `Meteor.startup`
  - Value should be {*Number*} in seconds
- - Ton set new TTL you need to drop index on `createdAt_1`
+ - To set new TTL you need to drop index on `createdAt_1`
 ```coffeescript
 Spiderable.cacheTTL = 3600 # 1 hour in seconds
 ```
 To drop TTL index run in Mongo console:
-```coffeescript
+```javascript
 db.SpiderableCacheCollection.dropIndex('createdAt_1');
 # or
 db.SpiderableCacheCollection.dropIndexes();
