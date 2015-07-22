@@ -3,16 +3,18 @@ spiderable-longer-timeout
 
 This is a branch of the standard meteor `spiderable` package, with some merged code from
 `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
-size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (10800 seconds).
+size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
 ### Install using
 ```shell
 meteor add jazeee:spiderable-longer-timeout
 ```
 
-### Things you must do to make it work
+### Required: Do the following to make it work
 #### Set `Meteor.isReadyForSpiderable` property
-Code will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
+Spiderable will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
+
+Set `Meteor.isReadyForSpiderable=true` when Meteor finishes publishing and rendering the UI. See [Guidelines](#guidelines)
 
 #### Optionally set `Spiderable.userAgentRegExps`
 `Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
@@ -20,15 +22,15 @@ Code will wait for a flag to be `true`, which gives finer control while content 
 Spiderable.userAgentRegExps.push /^vkShare/i
 ```
 
-#### Optionally set `Spiderable.cacheTTL`
+#### Optionally set `Spiderable.cacheLifetimeInMinutes`
 __Note:__ 
  - Should be set before `Meteor.startup`
- - Value should be {*Number*} in seconds
- - To set new TTL you need to drop index on `createdAt_1`
+ - Value should be {*Number*} in minutes
+ - To reset a new cache lifetime you need to drop index on `createdAt_1`.
 ```coffeescript
-Spiderable.cacheTTL = 3600 # 1 hour in seconds
+Spiderable.cacheLifetimeInMinutes = 60 # 1 hour in minutes
 ```
-To drop TTL index run in Mongo console:
+If you want to rebuild your cache, drop the cache index. To drop the cache index, run in Mongo console:
 ```javascript
 db.SpiderableCacheCollection.dropIndex('createdAt_1');
 /* or */
@@ -57,20 +59,20 @@ db.SpiderableCacheCollection.dropIndexes();
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
 
-#### `Spiderable.query`
-`Spiderable.query` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
+#### `Spiderable.customQuery`
+`Spiderable.customQuery` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
 This option may help to build different client's logic for requests from phantomjs and normal users
 
- - If `true` - to request will be appended query with key `___isPhantomjs___`, and `true` as a value
- - If `String` - to request will be appended query with your custom key `String`, and `true` as a value
+ - If `true` - Spiderable will append `___isRunningPhantomJS___=true` to the query
+ - If `String` - Spiderable will append `String=true` to the query
 ```coffeescript
-Spiderable.query = true
-Spiderable.query = '_fromPhantom_'
+Spiderable.customQuery = true
+Spiderable.customQuery = '_fromPhantom_'
 
 # Usage:
 Router.onAfterAction ->
-  if Meteor.isClient and _.has @params.query, '___isPhantomjs___'
-    Session.set '___isPhantomjs___', true
+  if Meteor.isClient and _.has @params.query, '___isRunningPhantomJS___'
+    Session.set '___isRunningPhantomJS___', true
 ```
 
 #### If you're using Iron-Router
@@ -96,7 +98,10 @@ You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is 
 I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
-If using IronRouter, I recommend that you create a base controller with `onAfterAction` function. Once checking for `@isReady()`, you can set `Meteor.isReadyForSpiderable = true` in that.
+####Guidelines
+* Make sure all subscriptions are completed.
+   * If you don't, Meteor may render correctly in local tests, but fail to render correctly on Google, resulting in bad spidering. Unfortunately, this may be intermittent, and hard to discover.
+   * If using IronRouter, create a base controller with `onAfterAction` function. Once checking for `@ready()`, set `Meteor.isReadyForSpiderable = true` in that.
 ```coffeescript
 BaseController = RouteController.extend
   onAfterAction: ->
@@ -106,6 +111,7 @@ BaseController = RouteController.extend
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
+* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See [testing](#testing) below.
 
 ### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
@@ -115,7 +121,7 @@ phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
 `Spiderable.originalRequest` is also set to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
 ### Testing
-You can test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
+Test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
 
 #### curl
 `curl` your `localhost` or host name, if you on production, like:
@@ -124,6 +130,25 @@ curl http://localhost:3000/?_escaped_fragment_=
 curl http://localhost:3000/ -A googlebot
 ```
 
+#### Google Tools: Fetch as Google
+Use `Fetch as Google` tools to scan your site. Tips:
+* Observe your server logs using tail -f or mup logs -f
+* `Fetch as Google` and observe that it takes 3-5 minutes before displaying results.
+   * Use an uncommon URL to help you identify your request in the logs. Consider adding an extra URL query parameter. For example:
+```shell
+# Simple test with test=1 query
+curl "http://localhost:3002/blogs?_escaped_fragment_=&test=1"
+# Set the date in the query, which will show up in Meteor logs, with a unique date.
+TEST=`date "+%Y%m%d-%H%M%S"`;echo $TEST;curl "http://localhost:3002/blogs?_escaped_fragment_=&test=${TEST}"
+```
+* Interpreting `Fetch as Google` results:
+   * The tool will not actually hit your server right away.
+   * It appears to provide a simple scan result without the extra `?_escaped_fragment_=` component.
+   * Wait several minutes more. Google appears to request the page, which will show up in your logs as `Spiderable successfully succeeded`.
+   * Search on Google using `site:your.site.com`
+   * Make sure Google lists all relevant pages.
+   * Look at Google's cached version of the pages, to make sure it is fully rendered.
+   * Make sure that Google sees the pages with all data subscriptions complete.
 
 ### From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 
