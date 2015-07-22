@@ -3,16 +3,18 @@ spiderable-longer-timeout
 
 This is a branch of the standard meteor `spiderable` package, with some merged code from
 `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
-size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (10800 seconds).
+size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
 ### Install using
 ```shell
 meteor add jazeee:spiderable-longer-timeout
 ```
 
-### Things you must do to make it work
+### Required: Do the following to make it work
 #### Set `Meteor.isReadyForSpiderable` property
-Code will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
+Spiderable will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
+
+Set `Meteor.isReadyForSpiderable=true` when Meteor finishes publishing and rendering the UI. See [Guidelines]
 
 #### Optionally set `Spiderable.userAgentRegExps`
 `Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
@@ -20,15 +22,15 @@ Code will wait for a flag to be `true`, which gives finer control while content 
 Spiderable.userAgentRegExps.push /^vkShare/i
 ```
 
-#### Optionally set `Spiderable.cacheTTL`
+#### Optionally set `Spiderable.cacheLifetimeInMinutes`
 __Note:__ 
  - Should be set before `Meteor.startup`
- - Value should be {*Number*} in seconds
- - To set new TTL you need to drop index on `createdAt_1`
+ - Value should be {*Number*} in minutes
+ - To reset a new cache lifetime you need to drop index on `createdAt_1` or wait for the previous cache to expire.
 ```coffeescript
-Spiderable.cacheTTL = 3600 # 1 hour in seconds
+Spiderable.cacheLifetimeInMinutes = 60 # 1 hour in minutes
 ```
-To drop TTL index run in Mongo console:
+If you want to rebuild your cache, drop the cache index. To drop the cache index, run in Mongo console:
 ```javascript
 db.SpiderableCacheCollection.dropIndex('createdAt_1');
 /* or */
@@ -57,20 +59,20 @@ db.SpiderableCacheCollection.dropIndexes();
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
 
-#### `Spiderable.query`
-`Spiderable.query` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
+#### `Spiderable.customQuery`
+`Spiderable.customQuery` __{*Boolean*|*String*}__ - additional `get` query appended to http request.
 This option may help to build different client's logic for requests from phantomjs and normal users
 
- - If `true` - to request will be appended query with key `___isPhantomjs___`, and `true` as a value
- - If `String` - to request will be appended query with your custom key `String`, and `true` as a value
+ - If `true` - Spiderable will append `___isRunningPhantomJS___=true` to the query
+ - If `String` - Spiderable will append `String=true` to the query
 ```coffeescript
-Spiderable.query = true
-Spiderable.query = '_fromPhantom_'
+Spiderable.customQuery = true
+Spiderable.customQuery = '_fromPhantom_'
 
 # Usage:
 Router.onAfterAction ->
-  if Meteor.isClient and _.has @params.query, '___isPhantomjs___'
-    Session.set '___isPhantomjs___', true
+  if Meteor.isClient and _.has @params.query, '___isRunningPhantomJS___'
+    Session.set '___isRunningPhantomJS___', true
 ```
 
 #### If you're using Iron-Router
@@ -109,7 +111,7 @@ BaseController = RouteController.extend
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
-* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See testing below.
+* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See [Testing] below.
 
 ### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install

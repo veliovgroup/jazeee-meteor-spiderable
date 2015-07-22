@@ -5,14 +5,14 @@ var crypto = Npm.require('crypto');
 var cacheCollection = new Mongo.Collection('SpiderableCacheCollection');
 
 Meteor.startup(function(){
-  if(!Spiderable.cacheTTL || !_.isNumber(Spiderable.cacheTTL)){
-    Spiderable.cacheTTL = 60 * 60 * 3; // 3 hours by default
+  if(!Spiderable.cacheLifetimeInMinutes || !_.isNumber(Spiderable.cacheLifetimeInMinutes)){
+    Spiderable.cacheLifetimeInMinutes = 3 * 60; // 3 hours by default
   }
 
   cacheCollection._ensureIndex({
     createdAt: 1
   },{ 
-    expireAfterSeconds: Spiderable.cacheTTL
+    expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
   });
 });
 
@@ -58,7 +58,7 @@ Spiderable.ignoredRoutes = [];
 Spiderable.debug = true;
 
 // how long to let phantomjs run before we kill it
-var REQUEST_TIMEOUT = 30 * 1000;
+var REQUEST_TIMEOUT_IN_MILLISECONDS = 30 * 1000; // 30 seconds
 // maximum size of result HTML. node's default is 200k which is too
 // small for our docs.
 var MAX_BUFFER = 10 * 1024 * 1024; // 10MB
@@ -71,11 +71,11 @@ Spiderable._urlForPhantom = function (siteAbsoluteUrl, requestUrl) {
   var escapedFragment = parsedQuery._escaped_fragment_;
   delete parsedQuery._escaped_fragment_;
 
-  if(Spiderable.query){
-    if(_.isString(Spiderable.query)){
-      parsedQuery[Spiderable.query] = 'true';
-    }else if(_.isBoolean(Spiderable.query) && Spiderable.query === true){
-      parsedQuery.___isPhantomjs___ = 'true';
+  if(Spiderable.customQuery){
+    if(_.isString(Spiderable.customQuery)){
+      parsedQuery[Spiderable.customQuery] = 'true';
+    }else if(_.isBoolean(Spiderable.customQuery) && Spiderable.customQuery){
+      parsedQuery.___isRunningPhantomJS___ = 'true';
     }
   }
 
@@ -144,7 +144,7 @@ WebApp.connectHandlers.use(function (req, res, next) {
       // Run phantomjs.
       child_process.exec(
         "phantomjs " + phantomJsArgs + " " + PHANTOM_SCRIPT + " " + JSON.stringify(url),
-        {timeout: REQUEST_TIMEOUT, maxBuffer: MAX_BUFFER},
+        {timeout: REQUEST_TIMEOUT_IN_MILLISECONDS, maxBuffer: MAX_BUFFER},
         function (error, stdout, stderr) {
           bindEnvironment(function(){
             if (!error && /<html/i.test(stdout)) {

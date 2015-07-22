@@ -21,6 +21,6 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-  api.use(['spiderable', 'tinytest']);
+  api.use(['jazeee:spiderable-longer-timeout', 'tinytest']);
   api.addFiles('spiderable_tests.js', 'server');
 });
