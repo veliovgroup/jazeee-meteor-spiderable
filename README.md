@@ -26,7 +26,7 @@ Spiderable.userAgentRegExps.push /^vkShare/i
 __Note:__ 
  - Should be set before `Meteor.startup`
  - Value should be {*Number*} in minutes
- - To reset a new cache lifetime you need to drop index on `createdAt_1` or wait for the previous cache to expire.
+ - To reset a new cache lifetime you need to drop index on `createdAt_1`.
 ```coffeescript
 Spiderable.cacheLifetimeInMinutes = 60 # 1 hour in minutes
 ```
