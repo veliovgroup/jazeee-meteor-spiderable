@@ -7,7 +7,7 @@ Package.describe({
 
 Package.onUse(function (api) {
   api.versionsFrom("METEOR@0.9.0");
-  api.use(['webapp', 'mongo', 'ostrio:meteor-root@1.0.0', 'sha'], 'server');
+  api.use(['webapp', 'mongo@1.1.0', 'ostrio:meteor-root@1.0.0', 'sha'], 'server');
   api.use(['templating'], 'client');
   api.use(['underscore'], ['client', 'server']);
 
