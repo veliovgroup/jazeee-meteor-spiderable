@@ -111,7 +111,7 @@ BaseController = RouteController.extend
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
-* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See (#testing) below.
+* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See testing(#testing) below.
 
 ### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
