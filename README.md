@@ -14,7 +14,7 @@ meteor add jazeee:spiderable-longer-timeout
 #### Set `Meteor.isReadyForSpiderable` property
 Spiderable will wait for a flag to be `true`, which gives finer control while content is preparing to be published.
 
-Set `Meteor.isReadyForSpiderable=true` when Meteor finishes publishing and rendering the UI. See (#Guidelines)
+Set `Meteor.isReadyForSpiderable=true` when Meteor finishes publishing and rendering the UI. See [Guidelines](#guidelines)
 
 #### Optionally set `Spiderable.userAgentRegExps`
 `Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
@@ -111,7 +111,7 @@ BaseController = RouteController.extend
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
 ```
-* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See (#Testing) below.
+* Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See (#testing) below.
 
 ### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
