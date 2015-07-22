@@ -1,7 +1,7 @@
 Package.describe({
   name: "jazeee:spiderable-longer-timeout",
   summary: "Extended spiderable package with caching, longer timeout, no stdin issues, and a publish flag.",
-  version: "1.2.0",
+  version: "1.2.1",
   git: "https://github.com/jazeee/jazeee-meteor-spiderable"
 });
 
@@ -12,15 +12,15 @@ Package.onUse(function (api) {
   api.use(['underscore'], ['client', 'server']);
 
 
-  api.addFiles('spiderable.js', ['client', 'server']);
-  api.addFiles(['spiderable.html', 'spiderable_client.js'], 'client');
-  api.addFiles('spiderable_server.js', 'server');
-  api.addFiles('phantom_script.js', 'server', { isAsset: true });
+  api.addFiles('lib/spiderable.js', ['client', 'server']);
+  api.addFiles(['lib/spiderable.html', 'lib/spiderable_client.js'], 'client');
+  api.addFiles('lib/spiderable_server.js', 'server');
+  api.addFiles('lib/phantom_script.js', 'server', { isAsset: true });
 
   api.export('Spiderable');
 });
 
 Package.onTest(function (api) {
   api.use(['jazeee:spiderable-longer-timeout', 'tinytest']);
-  api.addFiles('spiderable_tests.js', 'server');
+  api.addFiles('tests/spiderable_tests.js', 'server');
 });
