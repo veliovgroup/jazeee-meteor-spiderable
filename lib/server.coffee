@@ -85,7 +85,7 @@ Spiderable._urlForPhantom = (siteAbsoluteUrl, requestUrl) ->
 		parsedAbsoluteUrl.hash = '!' + decodeURIComponent(escapedFragment)
 	urlParser.format parsedAbsoluteUrl
 
-PHANTOM_SCRIPT = Meteor.rootPath + '/assets/packages/jazeee_spiderable-longer-timeout/phantom_script.js'
+PHANTOM_SCRIPT = Meteor.rootPath + '/assets/packages/jazeee_spiderable-longer-timeout/lib/phantom_script.js'
 
 WebApp.connectHandlers.use (req, res, next) ->
 	# _escaped_fragment_ comes from Google's AJAX crawling spec:
