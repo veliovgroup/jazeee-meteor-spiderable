@@ -100,12 +100,9 @@ WebApp.connectHandlers.use (req, res, next) ->
 		hash = SHA256(url)
 		cached = cacheCollection.findOne({hash})
 		if cached
-			if cached.error
-				res.writeHead cached.error, 'Content-Type': 'text/html; charset=UTF-8'
-				res.end()
-			else
-				res.writeHead 200, 'Content-Type': 'text/html; charset=UTF-8'
-				res.end cached.content
+			cached.responseCode ?= 200
+			res.writeHead cached.responseCode, 'Content-Type': 'text/html; charset=UTF-8'
+			res.end(cached.content)
 		else
 			# Allow override of phantomjs args via environment variable
 			# We use one environment variable to try to keep env-var explosion under control.
@@ -138,7 +135,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 								hash: hash
 								url: url
 								content: stdout
-								error: null
+								responseCode: 200
 								createdAt: new Date
 						res.end stdout
 					else if error and error.code == 40
@@ -150,7 +147,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 								hash: hash
 								url: url
 								content: null
-								error: +stdout
+								responseCode: +stdout
 								createdAt: new Date
 						res.end()
 					else
