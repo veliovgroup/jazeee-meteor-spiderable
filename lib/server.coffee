@@ -100,8 +100,12 @@ WebApp.connectHandlers.use (req, res, next) ->
 		hash = SHA256(url)
 		cached = cacheCollection.findOne({hash})
 		if cached
-			res.writeHead 200, 'Content-Type': 'text/html; charset=UTF-8'
-			res.end cached.content
+			if cached.error
+				res.writeHead cached.error, 'Content-Type': 'text/html; charset=UTF-8'
+				res.end()
+			else
+				res.writeHead 200, 'Content-Type': 'text/html; charset=UTF-8'
+				res.end cached.content
 		else
 			# Allow override of phantomjs args via environment variable
 			# We use one environment variable to try to keep env-var explosion under control.
@@ -129,13 +133,26 @@ WebApp.connectHandlers.use (req, res, next) ->
 						res.writeHead 200, 'Content-Type': 'text/html; charset=UTF-8'
 						if Spiderable.debug
 							console.info 'Spiderable successfully completed for url: ', url
-						cacheCollection.upsert { hash: hash },
+						cacheCollection.upsert {hash},
 							'$set':
 								hash: hash
 								url: url
 								content: stdout
+								error: null
 								createdAt: new Date
 						res.end stdout
+					else if error and error.code == 40
+						res.writeHead +stdout, 'Content-Type': 'text/html; charset=UTF-8'
+						if Spiderable.debug
+							console.error 'Spiderable failed for url: ', url, '\nstdout:', stdout, '\nstderr:', stderr
+						cacheCollection.upsert {hash},
+							'$set':
+								hash: hash
+								url: url
+								content: null
+								error: +stdout
+								createdAt: new Date
+						res.end()
 					else
 						# If phantomjs is failed. Don't send the error, instead send the normal page.
 						if Spiderable.debug
@@ -143,7 +160,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 						if error and error.code == 127
 							console.warn 'spiderable: phantomjs not installed. Download and install from http://phantomjs.org/'
 						else
-							console.warn 'spiderable: phantomjs failed:', error, '\nstderr:', stderr
+							console.warn 'spiderable: phantomjs failed:', error, '\nstdout:', stdout, '\nstderr:', stderr
 						next()
 					return
 				)

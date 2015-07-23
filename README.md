@@ -16,6 +16,12 @@ Spiderable will wait for a flag to be `true`, which gives finer control while co
 
 Set `Meteor.isReadyForSpiderable=true` when Meteor finishes publishing and rendering the UI. See [Guidelines](#guidelines)
 
+### Optional: Handling 404's and other errors
+
+* Set `Meteor.errorResponseCode = 404` or other error status code.
+* Spiderable will use that to respond with that errorResponseCode, regardless of whether the site generates "Not Found" html.
+* See issue #9
+
 #### Optionally set `Spiderable.userAgentRegExps`
 `Spiderable.userAgentRegExps` __{[*RegExp*]}__ - is array of Regular Expressions, of bot user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 ```coffeescript
@@ -110,6 +116,17 @@ BaseController = RouteController.extend
       Meteor.isReadyForSpiderable = true
   waitOn: ->
     [Meteor.subscribe 'someCollectionThatAffectsRenderingPerhaps']
+```
+* In order to improve SEO, make sure bad links return 404 error code.
+   * See Issue #9
+   * Responding with a 404 error code is not easy in Meteor or IronRouter.
+   * You can optionally set `Meteor.errorResponseCode = 404` to ensure that Spiderable returns a 404 (or whatever code you wish).
+   * If using IronRouter:
+```coffeescript
+Router.configure({notFoundTemplate: 'pageNotFound'})
+Template.pageNotFound.rendered = ->
+    Meteor.isPageNotFound = true
+    Meteor.errorResponseCode = 404
 ```
 * Google tools such as `Fetch as Google` may show that your page doesn't render correctly. See [testing](#testing) below.
 
