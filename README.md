@@ -1,17 +1,18 @@
 spiderable-longer-timeout
 ====
- - [About package]()
- - [Installation]()
- - [Setup]()
- - [Render page]()
- - [Options]()
- - [Set up bot's user agents]()
- - [Cache lifetime (TTL)]()
- - [Set ignored routes]()
- - [Differ Phantomjs from other users]()
- - [Redirect option]()
- - [Supported redirects]()
- - [Enable 404 page and right response]()
+ - [About package](#about)
+ - [Installation](#installation)
+ - [Setup](#setup)
+ - [Render page](#isreadyforspiderable-boolean)
+ - [Options](#options)
+ - [Set up bot's user agents](#useragentregexps-regexp)
+ - [Cache lifetime (TTL)](#cachelifetimeinminutes-cache-ttl-number)
+ - [Set ignored routes](#ignoredroutes-string)
+ - [Differ Phantomjs from other users](#customquery-booleanstring)
+ - [Redirect option](#redirect-string)
+ - [Supported redirects](#supported-redirects)
+ - [On/Off debug messages](#debug-boolean)
+ - [Enable 404 page and right response](#enable-default-404-response-if-youre-using-iron-router)
  - [Important notes]()
  - [How to install Phantomjs to server]()
  - [Testing]()
@@ -105,7 +106,7 @@ Router.onAfterAction ->
     Session.set '___isRunningPhantomJS___', true
 ```
 
-### redirect {*String*}
+##### redirect {*String*}
 Force redirect inside Phantomjs
 ```coffeescript
 Spiderable.redirect = 'http://example.com/another/page'
@@ -153,7 +154,7 @@ Router.go '/another/page'
 Router.current().redirect '/another/page'
 Router.route '/one', ->
   @redirect '/another/page'
-
+```
 
 ### **Important**
 You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is finished, in order to publish.
