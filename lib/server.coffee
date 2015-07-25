@@ -147,7 +147,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 				(error, stdout, stderr) ->
 					bindEnvironment ->
 						if !error
-							output = JSON.parse stdout
+							output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
 							output.status = if isNaN output.status then 200 else parseInt output.status
 							if output.headers and output.headers.length > 0
 								for header in output.headers
