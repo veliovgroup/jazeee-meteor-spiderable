@@ -28,7 +28,6 @@ topLevelCodeDone = ->
 
 Meteor.startup ->
 	if _.has(Package, "iron:router") and Router.options and Router.options.notFoundTemplate
-		console.log "HAS all packages"
 		if Meteor.isClient
 			Template[Router.options.notFoundTemplate].onCreated ->
 				if /___isRunningPhantomJS___/.test(Router.current().originalUrl)
