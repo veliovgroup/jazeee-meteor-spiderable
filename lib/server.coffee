@@ -138,6 +138,9 @@ WebApp.connectHandlers.use (req, res, next) ->
 			# More info: https://groups.google.com/forum/#!topic/meteor-core/uZhT3AHwpsI
 			if phantomJsArgs.indexOf('--ssl-protocol=') == -1
 				phantomJsArgs += ' --ssl-protocol=TLSv1'
+			# Support all kind of SSLs
+			if phantomJsArgs.indexOf('--ignore-ssl-errors=') == -1
+				phantomJsArgs += ' --ignore-ssl-errors=true'
 			# Run phantomjs.
 			child_process.exec "phantomjs #{phantomJsArgs} #{PHANTOM_SCRIPT} #{JSON.stringify(url)}"
 			,

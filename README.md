@@ -24,6 +24,8 @@ This is a branch of the standard meteor `spiderable` package, with some merged c
 `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
 size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
+This package will ignore all SSL error in favor of page fetching.
+
 This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers - exactly same headers will be returned to whom requested. Also it has support of all kind of [JavaScript redirects](#supported-redirects).
 
 This package has build-in caching mechanism, by default it storing results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
