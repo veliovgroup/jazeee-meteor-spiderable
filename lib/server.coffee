@@ -13,7 +13,6 @@ Meteor.startup ->
 		expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
 
 	if _.has(Package, "iron:router") and Router.options and Router.options.notFoundTemplate
-		console.log "HAS all packages"
 		if Meteor.isServer
 			Router.route '/___' + Router.options.notFoundTemplate
 			, 
@@ -60,7 +59,7 @@ Spiderable.userAgentRegExps = [
 Spiderable.ignoredRoutes = []
 
 # show debug messages in server's console
-Spiderable.debug = true
+Spiderable.debug = false
 
 # how long to let phantomjs run before we kill it
 REQUEST_TIMEOUT_IN_MILLISECONDS = 30 * 1000 # 30 seconds
