@@ -13,12 +13,12 @@ spiderable-longer-timeout
  - [Supported redirects](#supported-redirects)
  - [On/Off debug messages](#debug-boolean)
  - [Enable 404 page and right response](#enable-default-404-response-if-youre-using-iron-router)
- - [Important notes]()
- - [How to install Phantomjs to server]()
- - [Testing]()
- - [Test with CURL]()
- - [Test with Google]()
- - [Original Spiderable documentation]()
+ - [Important notes](#important)
+ - [How to install Phantomjs to server](#install-phantomjs-on-your-server)
+ - [Testing](#testing)
+ - [Test with CURL](#curl)
+ - [Test with Google](#google-tools-fetch-as-google)
+ - [Original Spiderable documentation](#from-meteors-original-spiderable-documentation-see-notes-specific-to-this-branch-above)
 
 ### About
 This is a branch of the standard meteor `spiderable` package, with some merged code from
@@ -156,30 +156,30 @@ Router.route '/one', ->
   @redirect '/another/page'
 ```
 
-### **Important**
+#### **Important**
 You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is finished, in order to publish.
 I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
 
 
-### Install PhantomJS on your server
+#### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
 phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
 `$PATH`. If you use Meteor Up, then `meteor deploy` will do this for you.
 
 `Spiderable.originalRequest` is also set to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
-### Testing
+#### Testing
 Test your site by appending a query to your URLs: `URL?_escaped_fragment_=` as in `http://your.site.com/path_escaped_fragment_=`
 
-#### curl
+##### curl
 `curl` your `localhost` or host name, if you on production, like:
 ```shell
 curl http://localhost:3000/?_escaped_fragment_=
 curl http://localhost:3000/ -A googlebot
 ```
 
-#### Google Tools: Fetch as Google
+##### Google Tools: Fetch as Google
 Use `Fetch as Google` tools to scan your site. Tips:
 * Observe your server logs using tail -f or mup logs -f
 * `Fetch as Google` and observe that it takes 3-5 minutes before displaying results.
