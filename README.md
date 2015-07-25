@@ -9,7 +9,6 @@ spiderable-longer-timeout
  - [Cache lifetime (TTL)](#cachelifetimeinminutes-cache-ttl-number)
  - [Set ignored routes](#ignoredroutes-string)
  - [Differ Phantomjs from other users](#customquery-booleanstring)
- - [Redirect option](#redirect-string)
  - [Supported redirects](#supported-redirects)
  - [On/Off debug messages](#debug-boolean)
  - [Enable 404 page and right response](#enable-default-404-response-if-youre-using-iron-router)
@@ -25,7 +24,7 @@ This is a branch of the standard meteor `spiderable` package, with some merged c
 `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
 size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
-This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers - exactly same headers will be returned to whom requested. Also it has support of all kind of [JavaScript redirects](#supported-redirects), additionally you can set `Spiderable.redirect` to force Phantomjs to be redirected.
+This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers - exactly same headers will be returned to whom requested. Also it has support of all kind of [JavaScript redirects](#supported-redirects).
 
 This package has build-in caching mechanism, by default it storing results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
 
@@ -106,12 +105,6 @@ Router.onAfterAction ->
     Session.set '___isRunningPhantomJS___', true
 ```
 
-##### redirect {*String*}
-Force redirect inside Phantomjs
-```coffeescript
-Spiderable.redirect = 'http://example.com/another/page'
-```
-
 ##### debug {*Boolean*}
 Show/hide server's console messages, set `Spiderable.debug` to `true` to show server's console messages
  - Default value: `false`
@@ -146,7 +139,6 @@ template(name="_404")
 
 ##### Supported redirects
 ```coffeescript
-Spiderable.redirect = 'http://example.com/another/page'
 window.location.href = 'http://example.com/another/page'
 window.location.replace 'http://example.com/another/page'
 
