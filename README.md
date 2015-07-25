@@ -25,7 +25,7 @@ This is a branch of the standard meteor `spiderable` package, with some merged c
 `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
 size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
-This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers exactly same headers will be returned to whom requested. Also it supports all kind of [JavaScript redirects](#supported-redirects), additionally you can use `Spiderable.redirect` to force Phantomjs to be redirected.
+This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers - exactly same headers will be returned to whom requested. Also it has support of all kind of [JavaScript redirects](#supported-redirects), additionally you can set `Spiderable.redirect` to force Phantomjs to be redirected.
 
 This package has build-in caching mechanism, by default it storing results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
 
@@ -44,8 +44,8 @@ Router.onAfterAction ->
 
 #### Options
 ##### userAgentRegExps {[*RegExp*]}
+Array of Regular Expressions, of bot's user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 Optionally set or extend `Spiderable.userAgentRegExps` list.
-`Spiderable.userAgentRegExps` - is array of Regular Expressions, of bot's user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 ```coffeescript
 Spiderable.userAgentRegExps.push /^vkShare/i
 ```
@@ -76,7 +76,7 @@ __Note:__
 ```coffeescript
 Spiderable.cacheLifetimeInMinutes = 60 # 1 hour in minutes
 ```
-If you want to change your cache lifetime, drop the cache index. To drop the cache index, run in Mongo console:
+If you want to change your cache lifetime, first - drop the cache index. To drop the cache index, run in Mongo console:
 ```javascript
 db.SpiderableCacheCollection.dropIndex('createdAt_1');
 /* or */
@@ -90,7 +90,7 @@ Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
 
 ##### customQuery {*Boolean*|*String*}
-`Spiderable.customQuery` - additional `get` query appended to http request.
+`Spiderable.customQuery` - additional `get` query will be appended to http request.
 This option may help to build different client's logic for requests from phantomjs and normal users
  - If `true` - Spiderable will append `___isRunningPhantomJS___=true` to the query
  - If `String` - Spiderable will append `String=true` to the query
@@ -113,15 +113,15 @@ Spiderable.redirect = 'http://example.com/another/page'
 ```
 
 ##### debug {*Boolean*}
-Show/hide server's console messages, set `Spiderable.debug` to `false` to avoid server's console messages
+Show/hide server's console messages, set `Spiderable.debug` to `true` to show server's console messages
  - Default value: `false`
 
 ```coffeescript
-Spiderable.debug = false
+Spiderable.debug = true
 ```
 
 ##### Enable default `404` response if you're using Iron-Router
- - Create template which you prefer return when page not found
+ - Create template which you prefer to return, when page is not found
  - Set `Spiderable.customQuery`
  - Set iron router's `notFoundTemplate`
  - Enable iron router's `dataNotFound` plugin, read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
