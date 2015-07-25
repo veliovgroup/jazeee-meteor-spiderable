@@ -18,7 +18,6 @@ Spiderable._initialSubscriptionsStarted = false
 
 startupCallbacksDone = ->
 	Spiderable._initialSubscriptionsStarted = true
-	return
 
 # This extra indirection is how we get called last
 
@@ -26,9 +25,6 @@ topLevelCodeDone = ->
 	# We'd like to use Meteor.startup here I think, but docs/behaviour of that is wrong
 	Meteor._setImmediate ->
 		startupCallbacksDone()
-		return
-	return
 
 Meteor.startup ->
 	topLevelCodeDone()
-	return
