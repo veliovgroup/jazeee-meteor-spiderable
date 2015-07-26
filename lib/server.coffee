@@ -55,6 +55,9 @@ Spiderable.userAgentRegExps = [
 	/^SiteLockSpider/i
 ]
 
+# allow/deny JavaScript redirects
+Spiderable.allowRedirects = true
+
 # list of routes that we want to serve statically, but do not obey the _escaped_fragment_ protocol.
 Spiderable.ignoredRoutes = []
 
@@ -141,6 +144,9 @@ WebApp.connectHandlers.use (req, res, next) ->
 			# Support all kind of SSLs
 			if phantomJsArgs.indexOf('--ignore-ssl-errors=') == -1
 				phantomJsArgs += ' --ignore-ssl-errors=true'
+			# to allow redirects on some systems we need set --web-security to false
+			if Spiderable.allowRedirects and phantomJsArgs.indexOf('--web-security=false') == -1
+				phantomJsArgs += ' --web-security=false'
 			# Run phantomjs.
 			child_process.exec "phantomjs #{phantomJsArgs} #{PHANTOM_SCRIPT} #{JSON.stringify(url)}"
 			,
@@ -151,6 +157,8 @@ WebApp.connectHandlers.use (req, res, next) ->
 					bindEnvironment ->
 						if !error
 							output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
+							output = '{}' if _.isEmpty output
+							output.status = 404 if output.status is null or output.status == 'null'
 							output.status = if isNaN output.status then 200 else parseInt output.status
 							if output.headers and output.headers.length > 0
 								for header in output.headers

@@ -32,6 +32,5 @@ Meteor.startup ->
 			Template[Router.options.notFoundTemplate].onCreated ->
 				if /___isRunningPhantomJS___/.test(Router.current().originalUrl)
 					window.location.href = window.location.origin + '/___' + Router.options.notFoundTemplate
-					Meteor.isReadyForSpiderable = true
 
 	topLevelCodeDone()
