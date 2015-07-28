@@ -40,7 +40,8 @@ meteor add jazeee:spiderable-longer-timeout
 On server and client tell to Spiderable what everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which gives finer control while content is preparing to be published.
 ```coffeescript
 Router.onAfterAction ->
-  Meteor.isReadyForSpiderable = true if @ready()
+  if @ready()
+    Meteor.isReadyForSpiderable = true
 ```
 
 #### Options

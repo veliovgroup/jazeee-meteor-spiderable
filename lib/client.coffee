@@ -27,7 +27,7 @@ topLevelCodeDone = ->
 		startupCallbacksDone()
 
 Meteor.startup ->
-	if _.has(Package, "iron:router") and Router.options and Router.options.notFoundTemplate
+	if _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
 		if Meteor.isClient
 			Template[Router.options.notFoundTemplate].onCreated ->
 				if /___isRunningPhantomJS___/.test(Router.current().originalUrl)

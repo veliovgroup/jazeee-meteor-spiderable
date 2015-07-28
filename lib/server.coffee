@@ -12,7 +12,7 @@ Meteor.startup ->
 		createdAt: 1
 		expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
 
-	if _.has(Package, "iron:router") and Router.options and Router.options.notFoundTemplate
+	if _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
 		if Meteor.isServer
 			Router.route '/___' + Router.options.notFoundTemplate
 			, 
@@ -99,6 +99,19 @@ Spiderable._urlForPhantom = (siteAbsoluteUrl, requestUrl) ->
 
 PHANTOM_SCRIPT =  "#{Meteor.rootPath}/assets/packages/jazeee_spiderable-longer-timeout/lib/phantom_script.js"
 
+responseHandler = (res, result) ->
+	result = {} if _.isEmpty result
+	result.status = 404 if result.status is null or result.status is 'null'
+	result.status = if isNaN result.status then 200 else parseInt result.status
+
+	if result.headers?.length > 0
+		for header in result.headers
+			res.setHeader header.name, header.value
+	else
+		res.setHeader 'Content-Type', 'text/html'
+	res.writeHead result.status
+	res.end result.content
+
 WebApp.connectHandlers.use (req, res, next) ->
 	# _escaped_fragment_ comes from Google's AJAX crawling spec:
 	# https://developers.google.com/webmasters/ajax-crawling/docs/specification
@@ -114,16 +127,9 @@ WebApp.connectHandlers.use (req, res, next) ->
 		cached 	= cacheCollection.findOne {hash}
 
 		if cached
-			status = cached.status or 200
-			if cached.headers and cached.headers.length > 0
-				for header in cached.headers
-					res.setHeader header.name, header.value
-			else
-				res.setHeader 'Content-Type', 'text/html'
+			responseHandler res, cached
 			console.info "Spiderable successfully completed [from cache] for url: [#{cached.status}] #{url}" if Spiderable.debug
-			res.writeHead status
-			res.end cached.content
-			return undefined
+			return
 		else
 			# Allow override of phantomjs args via environment variable
 			# We use one environment variable to try to keep env-var explosion under control.
@@ -157,34 +163,25 @@ WebApp.connectHandlers.use (req, res, next) ->
 					bindEnvironment ->
 						if !error
 							output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
-							output = '{}' if _.isEmpty output
-							output.status = 404 if output.status is null or output.status == 'null'
-							output.status = if isNaN output.status then 200 else parseInt output.status
-							if output.headers and output.headers.length > 0
-								for header in output.headers
-									res.setHeader header.name, header.value
-							else
-								res.setHeader 'Content-Type', 'text/html'
-							res.writeHead output.status
+							responseHandler res, output
 							console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
 							cacheCollection.upsert { hash },
 								'$set':
 									hash: hash
 									url: url
 									headers: output.headers
-									content: output.html
+									content: output.content
 									status: output.status
 									createdAt: new Date
-							res.end output.html
-							return undefined
+							return
 						else
 							# If phantomjs is failed. Don't send the error, instead send the normal page.
 							if Spiderable.debug
-								console.warn 'Spiderable failed for url: ', url, error, stdout, stderr
+								console.error 'Spiderable failed for url: ', url, error, stdout, stderr
 							if error and error.code == 127
 								console.warn 'spiderable: phantomjs not installed. Download and install from http://phantomjs.org/'
 							else
-								console.warn 'spiderable: phantomjs failed:', error, '\nstderr:', stderr
+								console.error 'spiderable: phantomjs failed:', error, '\nstderr:', stderr
 							next()
 	else
 		next()
