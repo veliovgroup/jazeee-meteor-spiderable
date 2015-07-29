@@ -17,7 +17,13 @@ Meteor.startup ->
 		,
 			(request, response) ->
 				response.writeHead '404', 'Content-Type': 'text/html'
-				response.end '<pre>404: Page not found</pre>'
+				try
+					html = Handlebars.templates[Router.options.notFoundTemplate]
+				catch error
+					console.error error if error
+					html = '<html><head><title>404: Page not found</title></head><body><pre>404: Page not found</pre></body></html>'
+				finally
+					response.end html
 
 cacheCollection._ensureIndex
 	hash: 1
