@@ -12,15 +12,12 @@ Meteor.startup ->
 		createdAt: 1
 		expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
 
-	if _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
-		if Meteor.isServer
-			Router.route '/___' + Router.options.notFoundTemplate
-			, 
-				->
-					@response.writeHead '404', 'Content-Type': 'text/html'
-					@response.end '<pre>404: Page not found</pre>'
-			,
-				where: 'server'
+	if Meteor.isServer and _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
+		WebApp.connectHandlers.use "/___#{Router.options.notFoundTemplate}"
+		,
+			(request, response) ->
+				response.writeHead '404', 'Content-Type': 'text/html'
+				response.end '<pre>404: Page not found</pre>'
 
 cacheCollection._ensureIndex
 	hash: 1
