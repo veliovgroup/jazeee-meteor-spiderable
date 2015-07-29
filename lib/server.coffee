@@ -162,6 +162,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 				(error, stdout, stderr) ->
 					bindEnvironment ->
 						if !error
+							# Extract JSON stringified phantomJS response after removing other potential Phantom logging messages. This regex extracts just the JSON.
 							output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
 							responseHandler res, output
 							console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug

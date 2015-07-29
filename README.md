@@ -8,10 +8,10 @@ spiderable-longer-timeout
  - [Set up bot's user agents](#useragentregexps-regexp)
  - [Cache lifetime (TTL)](#cachelifetimeinminutes-cache-ttl-number)
  - [Set ignored routes](#ignoredroutes-string)
- - [Differ Phantomjs from other users](#customquery-booleanstring)
+ - [Differentiate Phantomjs spider rendering from normal web browsing](#customquery-booleanstring)
  - [Supported redirects](#supported-redirects)
  - [On/Off debug messages](#debug-boolean)
- - [Enable 404 page and right response](#enable-default-404-response-if-youre-using-iron-router)
+ - [Enable 404 page and correct responses](#enable-default-404-response-if-youre-using-iron-router)
  - [Important notes](#important)
  - [How to install Phantomjs to server](#install-phantomjs-on-your-server)
  - [Testing](#testing)
@@ -26,9 +26,10 @@ size limit to 10MB. All results will be cached to Mongo collection, by default f
 
 This package will ignore all SSL error in favor of page fetching.
 
-This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers - exactly same headers will be returned to whom requested. Also it has support of all kind of [JavaScript redirects](#supported-redirects).
+This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers
+the package will return the same headers. This package also has support for [JavaScript redirects](#supported-redirects).
 
-This package has build-in caching mechanism, by default it storing results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
+This package has build-in caching mechanism, by default it stores results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
 
 ### Installation
 ```shell
@@ -37,7 +38,8 @@ meteor add jazeee:spiderable-longer-timeout
 
 #### Setup:
 ##### isReadyForSpiderable {*Boolean*}
-On server and client tell to Spiderable what everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which gives finer control while content is preparing to be published.
+On server and client this tells Spiderable that everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which allows for
+finer control about when content is ready to be published.
 ```coffeescript
 Router.onAfterAction ->
   if @ready()
@@ -86,7 +88,8 @@ db.SpiderableCacheCollection.dropIndexes();
 ```
 
 ##### ignoredRoutes {[*String*]}
-`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
+`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol.
+For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
 ```coffeescript
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
 ```
@@ -120,7 +123,7 @@ Spiderable.debug = true
  - Create template which you prefer to return, when page is not found
  - Set `Spiderable.customQuery`
  - Set iron router's `notFoundTemplate`
- - Enable iron router's `dataNotFound` plugin, read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
+ - Enable iron router's `dataNotFound` plugin. See below or read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
 
 ```coffeescript
 if Meteor.isServer
@@ -152,15 +155,14 @@ Router.route '/one', ->
 ```
 
 #### **Important**
-You will need to set `Meteor.isReadyForSpiderable` to `true` when your route is finished, in order to publish.
-I am deprecating `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
+Set `Meteor.isReadyForSpiderable` to `true` when your route is finished, in order to publish.
+Deprecated `Meteor.isRouteComplete=true`, but it will work until at least 2015-12-31 after which I'll remove it...
 See [code for details](https://github.com/jazeee/jazeee-meteor-spiderable/blob/master/phantom_script.js)
-
 
 #### Install PhantomJS on your server
 If you deploy your application with `meteor bundle`, you must install
 phantomjs ([http://phantomjs.org](http://phantomjs.org/)) somewhere in your
-`$PATH`. If you use Meteor Up, then `meteor deploy` will do this for you.
+`$PATH`. If you use Meteor Up, then `meteor deploy` can do this for you.
 
 `Spiderable.originalRequest` is also set to the http request. See [issue 1](https://github.com/jazeee/jazeee-meteor-spiderable/issues/1).
 
@@ -182,13 +184,13 @@ Use `Fetch as Google` tools to scan your site. Tips:
 ```shell
 # Simple test with test=1 query
 curl "http://localhost:3002/blogs?_escaped_fragment_=&test=1"
-# Set the date in the query, which will show up in Meteor logs, with a unique date.
+# Set the date in the query, which will show up in Meteor logs, with a unique date. (Turn on `Spiderable.debug=true`)
 TEST=`date "+%Y%m%d-%H%M%S"`; echo $TEST; curl "http://localhost:3000/blogs?_escaped_fragment_=&test=${TEST}"
 ```
 Interpreting `Fetch as Google` results:
  * The tool will not actually hit your server right away.
  * It appears to provide a simple scan result without the extra `?_escaped_fragment_=` component.
- * Wait several minutes more. Google appears to request the page, which will show up in your logs as `Spiderable successfully succeeded`.
+ * Wait several minutes more. Google appears to request the page, which will show up in your logs as `Spiderable successfully completed`.
  * Search on Google using `site:your.site.com`
  * Make sure Google lists all relevant pages.
  * Look at Google's cached version of the pages, to make sure it is fully rendered.
