@@ -1,7 +1,7 @@
 Package.describe({
   name: "jazeee:spiderable-longer-timeout",
   summary: "Extended spiderable package: SSL, caching, longer timeout, no stdin issues, publish flag",
-  version: "1.2.4",
+  version: "1.2.5",
   git: "https://github.com/jazeee/jazeee-meteor-spiderable"
 });
 
