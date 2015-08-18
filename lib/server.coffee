@@ -168,28 +168,26 @@ WebApp.connectHandlers.use (req, res, next) ->
 							# Extract JSON stringified phantomJS response after removing other potential Phantom logging messages. This regex extracts just the JSON.
 							try
 								output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
+								responseHandler res, output
+								console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
+								cacheCollection.upsert { hash },
+									'$set':
+										hash: hash
+										url: url
+										headers: output.headers
+										content: output.content
+										status: output.status
+										createdAt: new Date
+								return
 							catch error
-								console.error "Failed to parse PhantomJS output from: ", stdout
-								throw error
-							responseHandler res, output
-							console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
-							cacheCollection.upsert { hash },
-								'$set':
-									hash: hash
-									url: url
-									headers: output.headers
-									content: output.content
-									status: output.status
-									createdAt: new Date
-							return
+								console.error error, "Probably failed to parse PhantomJS output from: ", stdout
+						# If phantomjs failed. Don't send the error, instead send the normal page.
+						if Spiderable.debug
+							console.error 'Spiderable failed for url: ', url, error, stdout, stderr
+						if error?.code == 127
+							console.warn 'spiderable: phantomjs not installed. Download and install from http://phantomjs.org/'
 						else
-							# If phantomjs is failed. Don't send the error, instead send the normal page.
-							if Spiderable.debug
-								console.error 'Spiderable failed for url: ', url, error, stdout, stderr
-							if error and error.code == 127
-								console.warn 'spiderable: phantomjs not installed. Download and install from http://phantomjs.org/'
-							else
-								console.error 'spiderable: phantomjs failed:', error, '\nstderr:', stderr
-							next()
+							console.error 'spiderable: phantomjs failed:', error, '\nstderr:', stderr
+						next()
 	else
 		next()
