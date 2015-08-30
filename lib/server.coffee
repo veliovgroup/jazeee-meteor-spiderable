@@ -100,7 +100,7 @@ Spiderable._urlForPhantom = (siteAbsoluteUrl, requestUrl) ->
 		parsedAbsoluteUrl.hash = '!' + decodeURIComponent escapedFragment
 	urlParser.format parsedAbsoluteUrl
 
-PHANTOM_SCRIPT =  "#{Meteor.rootPath}/assets/packages/jazeee_spiderable-longer-timeout/lib/phantom_script.js"
+PHANTOM_SCRIPT =  "#{Meteor.rootPath}/assets/packages/4scotty_spiderable-longer-timeout/lib/phantom_script.js"
 
 responseHandler = (res, result) ->
 	result = {} if _.isEmpty result
