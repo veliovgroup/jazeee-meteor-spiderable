@@ -123,6 +123,7 @@ Spiderable.debug = true
  - Create template which you prefer to return, when page is not found
  - Set `Spiderable.customQuery`
  - Set iron router's `notFoundTemplate`
+ - Include a comment '<!-- response:status-code=404 -->' on your template. This way, we can ensure spiderable sends a 404 status code in the response headers
  - Enable iron router's `dataNotFound` plugin. See below or read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
 
 ```coffeescript
