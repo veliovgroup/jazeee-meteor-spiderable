@@ -33,7 +33,7 @@ This package has build-in caching mechanism, by default it stores results for 3 
 
 ### Installation
 ```shell
-meteor add 4scotty:spiderable-longer-timeout
+meteor add jazeee:spiderable-longer-timeout
 ```
 
 #### Setup:

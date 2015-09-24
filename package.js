@@ -1,5 +1,5 @@
 Package.describe({
-  name: "4scotty:spiderable-longer-timeout",
+  name: "jazeee:spiderable-longer-timeout",
   summary: "Extended spiderable package: SSL, caching, longer timeout, no stdin issues, publish flag",
   version: "1.2.8",
   git: "https://github.com/4scotty/4scotty-meteor-spiderable"
