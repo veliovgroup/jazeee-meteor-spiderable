@@ -157,7 +157,8 @@ WebApp.connectHandlers.use (req, res, next) ->
 			if Spiderable.allowRedirects and phantomJsArgs.indexOf('--web-security=false') == -1
 				phantomJsArgs += ' --web-security=false'
 			# Run phantomjs.
-			child_process.exec "phantomjs #{phantomJsArgs} #{PHANTOM_SCRIPT} #{JSON.stringify(url)}"
+			fullCommand = "phantomjs #{phantomJsArgs} #{PHANTOM_SCRIPT} #{JSON.stringify(url)}"
+			child_process.exec fullCommand
 			,
 				timeout: REQUEST_TIMEOUT_IN_MILLISECONDS
 				maxBuffer: MAX_BUFFER
