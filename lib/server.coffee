@@ -5,6 +5,18 @@ crypto = Npm.require 'crypto'
 
 cacheCollection = new Mongo.Collection 'SpiderableCacheCollection'
 
+hashCode = (string) ->
+  hash = 0
+  len = string.length
+  return hash if len == 0
+  i = 0
+  while i < len
+    chr = string.charCodeAt i
+    hash = (hash << 5) - hash + chr
+    hash |= 0
+    i++
+  hash.toString 16
+
 Meteor.startup ->
 	Spiderable.cacheLifetimeInMinutes ?= 3 * 60 # 3 hours by default
 	throw new Meteor.Error "Bad Spiderable.cacheLifetimeInMinutes" unless _.isNumber(Spiderable.cacheLifetimeInMinutes)
@@ -12,25 +24,11 @@ Meteor.startup ->
 		createdAt: 1
 		expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
 
-	if Meteor.isServer and _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
-		WebApp.connectHandlers.use "/___#{Router.options.notFoundTemplate}"
-		,
-			(request, response) ->
-				response.writeHead '404', 'Content-Type': 'text/html'
-				try
-					html = Handlebars.templates[Router.options.notFoundTemplate]
-				catch error
-					console.error error if error
-					html = '<html><head><title>404: Page not found</title></head><body><pre>404: Page not found</pre></body></html>'
-				finally
-					response.end html
-
 cacheCollection._ensureIndex
 	hash: 1
 	unique: true
 
-bindEnvironment = Meteor.bindEnvironment (callback) ->
-	callback()
+bindEnvironment = Meteor.bindEnvironment (callback) -> callback()
 
 # list of bot user agents that we want to serve statically, but do
 # not obey the _escaped_fragment_ protocol. The page is served
@@ -126,7 +124,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 
 		Spiderable.originalRequest = req
 		url 		= Spiderable._urlForPhantom Meteor.absoluteUrl(), req.url
-		hash 		= SHA256 url
+		hash 		= hashCode url
 		cached 	= cacheCollection.findOne {hash}
 
 		if cached
@@ -169,6 +167,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 							# Extract JSON stringified phantomJS response after removing other potential Phantom logging messages. This regex extracts just the JSON.
 							try
 								output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
+								console.log output
 								responseHandler res, output
 								console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
 								cacheCollection.upsert { hash },

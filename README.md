@@ -11,6 +11,7 @@ spiderable-longer-timeout
  - [Differentiate Phantomjs spider rendering from normal web browsing](#customquery-booleanstring)
  - [Supported redirects](#supported-redirects)
  - [On/Off debug messages](#debug-boolean)
+ - [Response statuses](#response-statuses)
  - [Enable 404 page and correct responses](#enable-default-404-response-if-youre-using-iron-router)
  - [Important notes](#important)
  - [How to install Phantomjs to server](#install-phantomjs-on-your-server)
@@ -119,17 +120,22 @@ Show/hide server's console messages, set `Spiderable.debug` to `true` to show se
 Spiderable.debug = true
 ```
 
+##### Response statuses
+You able to send any response status from phantomjs, this behavior may be easily controlled via `<!-- response:status-code= -->` HTML/JADE comment.
+ - 201 - `<!-- response:status-code=201 -->`
+ - 401 - `<!-- response:status-code=401 -->`
+ - 403 - `<!-- response:status-code=403 -->`
+ - 500 - `<!-- response:status-code=500 -->`
+
+This directive accepts any 3-digit value, so you may return any standard or custom response code.
+
 ##### Enable default `404` response if you're using Iron-Router
  - Create template which you prefer to return, when page is not found
- - Set `Spiderable.customQuery`
  - Set iron router's `notFoundTemplate`
- - Include a comment '<!-- response:status-code=404 -->' on your template. This way, we can ensure spiderable sends a 404 status code in the response headers
+ - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a 404 status code in the response headers
  - Enable iron router's `dataNotFound` plugin. See below or read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
 
 ```coffeescript
-if Meteor.isServer
-  Spiderable.customQuery = true
-
 Router.configure
   notFoundTemplate: '_404'
 
@@ -139,9 +145,19 @@ Router.plugin 'dataNotFound',
 
 ```jade
 template(name="_404")
+  // response:status-code=404
   h1 404
   h3 Oops, page not found
   p Sorry, page you're requested is not exists or was deleted
+```
+
+```html
+<template name="_404">
+  <!--response:status-code=404-->
+  <h1>404</h1>
+  <h3>Oops, page not found</h3>
+  <p>Sorry, page you're requested is not exists or was deleted</p>
+</template>
 ```
 
 ##### Supported redirects

@@ -26,11 +26,4 @@ topLevelCodeDone = ->
 	Meteor._setImmediate ->
 		startupCallbacksDone()
 
-Meteor.startup ->
-	if _.has(Package, "iron:router") and Router?.options?.notFoundTemplate?
-		if Meteor.isClient
-			Template[Router.options.notFoundTemplate].onCreated ->
-				if /___isRunningPhantomJS___/.test(Router.current().originalUrl)
-					window.location.href = window.location.origin + '/___' + Router.options.notFoundTemplate
-
-	topLevelCodeDone()
+Meteor.startup -> topLevelCodeDone()
