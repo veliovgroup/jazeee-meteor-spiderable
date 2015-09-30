@@ -121,18 +121,18 @@ Spiderable.debug = true
 ```
 
 ##### Response statuses
-You able to send any response status from phantomjs, this behavior may be easily controlled via `<!-- response:status-code= -->` HTML/JADE comment.
- - 201 - `<!-- response:status-code=201 -->`
- - 401 - `<!-- response:status-code=401 -->`
- - 403 - `<!-- response:status-code=403 -->`
- - 500 - `<!-- response:status-code=500 -->`
+You able to send any response status from phantomjs, this behavior may be easily controlled via special `HTML`/`JADE` comment:
+ - `201` - `<!-- response:status-code=201 -->`
+ - `401` - `<!-- response:status-code=401 -->`
+ - `403` - `<!-- response:status-code=403 -->`
+ - `500` - `<!-- response:status-code=500 -->`
 
 This directive accepts any 3-digit value, so you may return any standard or custom response code.
 
 ##### Enable default `404` response if you're using Iron-Router
  - Create template which you prefer to return, when page is not found
  - Set iron router's `notFoundTemplate`
- - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a 404 status code in the response headers
+ - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a `404` status code in the response headers
  - Enable iron router's `dataNotFound` plugin. See below or read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
 
 ```coffeescript
