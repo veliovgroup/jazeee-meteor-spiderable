@@ -5,28 +5,12 @@ crypto = Npm.require 'crypto'
 
 cacheCollection = new Mongo.Collection 'SpiderableCacheCollection'
 
-hashCode = (string) ->
-  hash = 0
-  len = string.length
-  return hash if len == 0
-  i = 0
-  while i < len
-    chr = string.charCodeAt i
-    hash = (hash << 5) - hash + chr
-    hash |= 0
-    i++
-  hash.toString 16
-
 Meteor.startup ->
 	Spiderable.cacheLifetimeInMinutes ?= 3 * 60 # 3 hours by default
 	throw new Meteor.Error "Bad Spiderable.cacheLifetimeInMinutes" unless _.isNumber(Spiderable.cacheLifetimeInMinutes)
-	cacheCollection._ensureIndex 
-		createdAt: 1
-		expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60
+	cacheCollection._ensureIndex {createdAt: 1}, {expireAfterSeconds: Spiderable.cacheLifetimeInMinutes * 60, background: true}
 
-cacheCollection._ensureIndex
-	hash: 1
-	unique: true
+cacheCollection._ensureIndex {hash: 1}, {unique: true, background: true}
 
 bindEnvironment = Meteor.bindEnvironment (callback) -> callback()
 
@@ -124,7 +108,7 @@ WebApp.connectHandlers.use (req, res, next) ->
 
 		Spiderable.originalRequest = req
 		url 		= Spiderable._urlForPhantom Meteor.absoluteUrl(), req.url
-		hash 		= hashCode url
+		hash 		= new Buffer(url).toString 'base64'
 		cached 	= cacheCollection.findOne {hash}
 
 		if cached
