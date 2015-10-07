@@ -9,6 +9,5 @@ Router.plugin 'dataNotFound',
   notFoundTemplate: Router.options.notFoundTemplate
 
 if Meteor.isServer
-  Spiderable.customQuery = true
   #Technically, not minimal requirement, but helps debugging
   Spiderable.debug = true
