@@ -91,7 +91,7 @@ responseHandler = (res, result) ->
 
 	if result.headers?.length > 0
 		for header in result.headers
-			res.setHeader header.name, header.value
+			res.setHeader header.name, header.value unless /gzip/i.test header.value
 	else
 		res.setHeader 'Content-Type', 'text/html'
 	res.writeHead result.status
