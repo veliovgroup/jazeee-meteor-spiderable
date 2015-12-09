@@ -149,21 +149,25 @@ WebApp.connectHandlers.use (req, res, next) ->
 					bindEnvironment ->
 						if !error
 							# Extract JSON stringified phantomJS response after removing other potential Phantom logging messages. This regex extracts just the JSON.
-							try
-								output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
-								responseHandler res, output
-								console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
-								cacheCollection.upsert { hash },
-									'$set':
-										hash: hash
-										url: url
-										headers: output.headers
-										content: output.content
-										status: output.status
-										createdAt: new Date
-								return
-							catch error
-								console.error error, "Probably failed to parse PhantomJS output from: ", stdout
+							if stdout.length
+								try
+									output = JSON.parse stdout.replace /^(?!(\{.*\})$)(.*)|\r\n/gim, ''
+									responseHandler res, output
+									console.info "Spiderable successfully completed for url: [#{output.status}] #{url}" if Spiderable.debug
+									cacheCollection.upsert { hash },
+										'$set':
+											hash: hash
+											url: url
+											headers: output.headers
+											content: output.content
+											status: output.status
+											createdAt: new Date
+									return
+								catch error
+									console.error error, "Probably failed to parse PhantomJS output from: ", stdout
+							else
+								console.info "Meteor application returned empty response" if Spiderable.debug
+								return responseHandler res, {status: 204, content: ''}
 						# If phantomjs failed. Don't send the error, instead send the normal page.
 						if Spiderable.debug
 							console.error 'Spiderable failed for url: ', url, error, stdout, stderr

@@ -12,7 +12,8 @@ spiderable-longer-timeout
  - [Supported redirects](#supported-redirects)
  - [On/Off debug messages](#debug-boolean)
  - [Response statuses](#response-statuses)
- - [Enable 404 page and correct responses](#enable-default-404-response-if-youre-using-iron-router)
+ - [Enable 404 page and correct responses (IR)](#enable-default-404-response-if-youre-using-iron-router)
+ - [Enable 404 page and correct responses (FR)](#enable-default-404-response-if-youre-using-flow-router)
  - [Important notes](#important)
  - [How to install Phantomjs to server](#install-phantomjs-on-your-server)
  - [Testing](#testing)
@@ -29,6 +30,12 @@ This package will ignore all SSL error in favor of page fetching.
 
 This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers
 the package will return the same headers. This package also has support for [JavaScript redirects](#supported-redirects).
+
+This package tested with [iron-router](https://github.com/iron-meteor/iron-router) and [flow-router](https://github.com/kadirahq/flow-router), with and without next packages:
+ - [fast-render](https://github.com/kadirahq/fast-render)
+ - [subs-manager](https://github.com/kadirahq/subs-manager)
+ - [appcache](https://github.com/meteor/meteor/wiki/AppCache)
+ - [files](https://github.com/VeliovGroup/Meteor-Files)
 
 This package has build-in caching mechanism, by default it stores results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
 
@@ -141,6 +148,36 @@ Router.configure
 
 Router.plugin 'dataNotFound', 
   notFoundTemplate: Router.options.notFoundTemplate
+```
+
+```jade
+template(name="_404")
+  // response:status-code=404
+  h1 404
+  h3 Oops, page not found
+  p Sorry, page you're requested is not exists or was deleted
+```
+
+```html
+<template name="_404">
+  <!--response:status-code=404-->
+  <h1>404</h1>
+  <h3>Oops, page not found</h3>
+  <p>Sorry, page you're requested is not exists or was deleted</p>
+</template>
+```
+
+##### Enable default `404` response if you're using Flow-Router
+ - Create template which you prefer to return, when page is not found
+ - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a `404` status code in the response headers
+ - Set flow router's `notFound` property. See below or read more about [flow-router not found routes](https://github.com/kadirahq/flow-router#not-found-routes)
+
+```coffeescript
+# With layout
+FlowRouter.notFound = action: -> BlazeLayout.render '_layout', content: '_404'
+
+# Without layout
+FlowRouter.notFound = action: -> BlazeLayout.render '_404'
 ```
 
 ```jade
