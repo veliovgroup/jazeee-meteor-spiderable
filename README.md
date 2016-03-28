@@ -252,8 +252,11 @@ Interpreting `Fetch as Google` results:
 
 ##### Testing PhantomJS
 PhantomJS can be temperamental, and can be a challenge to work with.
+
 If PhantomJS is failing on your server, you can try running it directly to help debug what is broken.
+
 On the server console, try running `phantomjs --version`
+
 Also, you can run this package's PhantomJS script. In order to do so, you'd need to find the phantom_script.js file.
 ```bash
 # Find phantom_script.js
