@@ -96,7 +96,7 @@ db.SpiderableCacheCollection.dropIndexes();
 ```
 
 ##### ignoredRoutes {[*String*]}
-`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol.
+`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. This is a server only parameter.
 For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
 ```coffeescript
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
