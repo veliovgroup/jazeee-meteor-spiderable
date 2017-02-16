@@ -44,22 +44,29 @@ This package has build-in caching mechanism, by default it stores results for 3 
 meteor add jazeee:spiderable-longer-timeout
 ```
 
+### ES6 import
+```jsx
+import { Spiderable } from 'meteor/jazeee:spiderable-longer-timeout';
+```
+
 #### Setup:
 ##### isReadyForSpiderable {*Boolean*}
 On server and client this tells Spiderable that everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which allows for
 finer control about when content is ready to be published.
-```coffeescript
-Router.onAfterAction ->
-  if @ready()
-    Meteor.isReadyForSpiderable = true
+```jsx
+Router.onAfterAction( function () {
+  if (this.ready()) {
+    Meteor.isReadyForSpiderable = true;
+  }
+});
 ```
 
 #### Options
 ##### userAgentRegExps {[*RegExp*]}
 Array of Regular Expressions, of bot's user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
 Optionally set or extend `Spiderable.userAgentRegExps` list.
-```coffeescript
-Spiderable.userAgentRegExps.push /^vkShare/i
+```jsx
+Spiderable.userAgentRegExps.push(/^vkShare/i);
 ```
 __Default Bots__:
  - `/^facebookExternalHit/i`
@@ -85,8 +92,8 @@ __Note:__
  - To set a new cache lifetime you need to drop index on `createdAt_1`.
  - __Default value__: 180 (3 hours)
 
-```coffeescript
-Spiderable.cacheLifetimeInMinutes = 60 # 1 hour in minutes
+```jsx
+Spiderable.cacheLifetimeInMinutes = 60; // 1 hour in minutes
 ```
 If you want to change your cache lifetime, first - drop the cache index. To drop the cache index, run in Mongo console:
 ```javascript
@@ -98,8 +105,8 @@ db.SpiderableCacheCollection.dropIndexes();
 ##### ignoredRoutes {[*String*]}
 `Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. This is a server only parameter.
 For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
-```coffeescript
-Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
+```jx
+Spiderable.ignoredRoutes.push('/cdn/storage/Files/');
 ```
 
 ##### customQuery {*Boolean*|*String*}
@@ -108,23 +115,25 @@ This option may help to build different client's logic for requests from phantom
  - If `true` - Spiderable will append `___isRunningPhantomJS___=true` to the query
  - If `String` - Spiderable will append `String=true` to the query
 
-```coffeescript
-Spiderable.customQuery = true
-# or
+```jsx
+Spiderable.customQuery = true;
+// or
 Spiderable.customQuery = '_fromPhantom_'
 
-# Usage:
-Router.onAfterAction ->
-  if Meteor.isClient and _.has @params.query, '___isRunningPhantomJS___'
-    Session.set '___isRunningPhantomJS___', true
+// Usage:
+Router.onAfterAction( function () {
+  if(Meteor.isClient && _.has(this.params.query, '___isRunningPhantomJS___') {
+    Session.set('___isRunningPhantomJS___', true);
+  }
+});
 ```
 
 ##### debug {*Boolean*}
 Show/hide server's console messages, set `Spiderable.debug` to `true` to show server's console messages
  - Default value: `false`
 
-```coffeescript
-Spiderable.debug = true
+```jsx
+Spiderable.debug = true;
 ```
 
 ##### Response statuses
@@ -142,12 +151,14 @@ This directive accepts any 3-digit value, so you may return any standard or cust
  - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a `404` status code in the response headers
  - Enable iron router's `dataNotFound` plugin. See below or read more about [iron-router plugins](http://iron-meteor.github.io/iron-router/#plugins)
 
-```coffeescript
-Router.configure
+```jsx
+Router.configure({
   notFoundTemplate: '_404'
+});
 
-Router.plugin 'dataNotFound', 
+Router.plugin('dataNotFound', {
   notFoundTemplate: Router.options.notFoundTemplate
+});
 ```
 
 ```jade
@@ -172,12 +183,20 @@ template(name="_404")
  - Include a comment `<!-- response:status-code=404 -->` on your template. This way, we can ensure spiderable sends a `404` status code in the response headers
  - Set flow router's `notFound` property. See below or read more about [flow-router not found routes](https://github.com/kadirahq/flow-router#not-found-routes)
 
-```coffeescript
-# With layout
-FlowRouter.notFound = action: -> BlazeLayout.render '_layout', content: '_404'
+```jsx
+// With layout
+FlowRouter.notFound = {
+  action() {
+    BlazeLayout.render('_layout', {content: '_404'});
+  }
+}
 
-# Without layout
-FlowRouter.notFound = action: -> BlazeLayout.render '_404'
+// Without layout
+FlowRouter.notFound = {
+  action() {
+    BlazeLayout.render('_404');
+  }
+}
 ```
 
 ```jade
@@ -198,14 +217,15 @@ template(name="_404")
 ```
 
 ##### Supported redirects
-```coffeescript
-window.location.href = 'http://example.com/another/page'
-window.location.replace 'http://example.com/another/page'
+```jsx
+window.location.href = 'http://example.com/another/page';
+window.location.replace 'http://example.com/another/page';
 
-Router.go '/another/page'
-Router.current().redirect '/another/page'
-Router.route '/one', ->
-  @redirect '/another/page'
+Router.go('/another/page');
+Router.current().redirect('/another/page');
+Router.route('/one', function () {
+  this.redirect('/another/page');
+});
 ```
 
 #### **Important**
