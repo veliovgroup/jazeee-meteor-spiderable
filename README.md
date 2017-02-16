@@ -96,7 +96,7 @@ db.SpiderableCacheCollection.dropIndexes();
 ```
 
 ##### ignoredRoutes {[*String*]}
-`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol.
+`Spiderable.ignoredRoutes` - is array of strings, routes that we want to serve statically, but do not obey the `_escaped_fragment_` protocol. This is a server only parameter.
 For more info see this [thread](https://github.com/meteor/meteor/issues/3853).
 ```coffeescript
 Spiderable.ignoredRoutes.push '/cdn/storage/Files/'
@@ -249,6 +249,25 @@ Interpreting `Fetch as Google` results:
  * Make sure Google lists all relevant pages.
  * Look at Google's cached version of the pages, to make sure it is fully rendered.
  * Make sure that Google sees the pages with all data subscriptions complete.
+
+##### Testing PhantomJS
+PhantomJS can be temperamental, and can be a challenge to work with.
+
+If PhantomJS is failing on your server, you can try running it directly to help debug what is broken.
+
+On the server console, try running `phantomjs --version`
+
+Also, you can run this package's PhantomJS script. In order to do so, you'd need to find the phantom_script.js file.
+```bash
+# Find phantom_script.js
+PHANTOM_SCRIPT=$(find /opt/YOUR_WEB_APP/app/ -name phantom_script.js)
+# Verify that you found just one
+echo ${PHANTOM_SCRIPT}
+# Try running phantomjs with that script
+phantomjs --load-images=no --ssl-protocol=TLSv1 --ignore-ssl-errors=true --web-security=false ${PHANTOM_SCRIPT}    http://localhost
+# Verify that it succeeded (should return 0)
+echo $?
+```
 
 ### From Meteor's original Spiderable documentation. See notes specific to this branch (above).
 `spiderable` is part of [Webapp](https://www.meteor.com/webapp). It's
