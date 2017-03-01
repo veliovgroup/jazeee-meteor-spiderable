@@ -1,25 +1,25 @@
 Package.describe({
-  name: "jazeee:spiderable-longer-timeout",
-  summary: "Extended spiderable package: SSL, caching, longer timeout, no stdin issues, publish flag",
-  version: "1.2.13",
-  git: "https://github.com/jazeee/jazeee-meteor-spiderable"
+  name: 'jazeee:spiderable-longer-timeout',
+  summary: 'Extended spiderable package: SSL, caching, longer timeout, no stdin issues, publish flag',
+  version: '1.3.0',
+  git: 'https://github.com/jazeee/jazeee-meteor-spiderable'
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom("METEOR@0.9.0");
-  api.use(['webapp', 'mongo@1.1.3', 'ostrio:meteor-root@1.0.2'], 'server');
+  api.versionsFrom('METEOR@1.4');
+  api.use(['webapp', 'mongo', 'ostrio:meteor-root@1.0.4'], 'server');
   api.use(['templating'], 'client');
-  api.use(['underscore', 'coffeescript'], ['client', 'server']);
+  api.use(['underscore', 'ecmascript'], ['client', 'server']);
 
-  api.addFiles('lib/spiderable.coffee', ['client', 'server']);
-  api.addFiles(['lib/spiderable.html', 'lib/client.coffee'], 'client');
-  api.addFiles('lib/server.coffee', 'server');
+  api.mainModule('lib/spiderable.js', ['client', 'server']);
+  api.addFiles(['lib/spiderable.html', 'lib/client.js'], 'client');
+  api.addFiles('lib/server.js', 'server');
   api.addAssets('lib/phantom_script.js', 'server');
 
   api.export('Spiderable');
 });
 
 Package.onTest(function (api) {
-  api.use(['jazeee:spiderable-longer-timeout', 'tinytest']);
+  api.use(['jazeee:spiderable-longer-timeout', 'tinytest', 'underscore', 'ecmascript']);
   api.addFiles('tests/spiderable_tests.js', 'server');
 });
