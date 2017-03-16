@@ -69,20 +69,20 @@ Optionally set or extend `Spiderable.userAgentRegExps` list.
 Spiderable.userAgentRegExps.push(/^vkShare/i);
 ```
 __Default Bots__:
- - `/^facebookExternalHit/i`
- - `/^linkedinBot/i`
- - `/^twitterBot/i`
- - `/^googleBot/i`
- - `/^bingBot/i`
- - `/^yandex/i`
- - `/^google-structured-data-testing-tool/i`
- - `/^yahoo/i`
- - `/^MJ12Bot/i`
- - `/^tweetmemeBot/i`
- - `/^baiduSpider/i`
- - `/^Mail\.RU_Bot/i`
- - `/^ahrefsBot/i`
- - `/^SiteLockSpider/`
+ - `/facebookExternalHit/i`
+ - `/linkedinBot/i`
+ - `/twitterBot/i`
+ - `/googleBot/i`
+ - `/bingBot/i`
+ - `/yandex/i`
+ - `/google-structured-data-testing-tool/i`
+ - `/yahoo/i`
+ - `/MJ12Bot/i`
+ - `/tweetmemeBot/i`
+ - `/baiduSpider/i`
+ - `/Mail\.RU_Bot/i`
+ - `/ahrefsBot/i`
+ - `/SiteLockSpider/`
 
 ##### cacheLifetimeInMinutes (Cache TTL) {*Number*}
 How long cached Spiderable results should be stored (in minutes).
