@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'nabil:modern-spiderable',
+  name: 'nabilfreeman:modern-spiderable',
   summary: 'Extended spiderable package: SSL, caching, longer timeout, no stdin issues, publish flag',
   version: '1.0.0',
   git: 'https://github.com/nabilfreeman/meteor-modern-spiderable'
@@ -20,6 +20,6 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-  api.use(['nabil:modern-spiderable', 'tinytest', 'underscore', 'ecmascript']);
+  api.use(['nabilfreeman:modern-spiderable', 'tinytest', 'underscore', 'ecmascript']);
   api.addFiles('tests/spiderable_tests.js', 'server');
 });
