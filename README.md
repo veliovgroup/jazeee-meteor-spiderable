@@ -136,18 +136,18 @@ Show/hide server's console messages, set `Spiderable.debug` to `true` to show se
 Spiderable.debug = true;
 ```
 
-##### bufferSizeInBytes {*Number*}
-Memory allocation for PhantomJS (in bytes).
+##### bufferSize {*Number*}
+Memory allocation for PhantomJS (__in bytes__).
 __Note:__ 
  - Should be set before `Meteor.startup`
  - Value should be {*Number*} in bytes
  - __Default value__: 10485760 (10MB)
 
 ```jsx
-Spiderable.bufferSizeInBytes = 10 * 1024 * 1024; // 10MB in bytes
+Spiderable.bufferSize = 10 * 1024 * 1024; // 10MB in bytes
 ```
 
-##### requestTimeoutInMilliseconds {*Number*}
+##### requestTimeout {*Number*}
 Request timeout length.
 __Note:__ 
  - Should be set before `Meteor.startup`
@@ -155,7 +155,7 @@ __Note:__
  - __Default value__: 30000 (30 seconds)
 
 ```jsx
-Spiderable.bufferSizeInBytes = 30 * 1000; // 30 seconds in minutes
+Spiderable.requestTimeout = 30 * 1000; // 30 seconds in minutes
 ```
 
 ##### Response statuses
