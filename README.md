@@ -136,6 +136,28 @@ Show/hide server's console messages, set `Spiderable.debug` to `true` to show se
 Spiderable.debug = true;
 ```
 
+##### bufferSizeInBytes {*Number*}
+Memory allocation for PhantomJS (in bytes).
+__Note:__ 
+ - Should be set before `Meteor.startup`
+ - Value should be {*Number*} in bytes
+ - __Default value__: 10485760 (10MB)
+
+```jsx
+Spiderable.bufferSizeInBytes = 10 * 1024 * 1024; // 10MB in bytes
+```
+
+##### requestTimeoutInMilliseconds {*Number*}
+Request timeout length.
+__Note:__ 
+ - Should be set before `Meteor.startup`
+ - Value should be {*Number*} in milliseconds
+ - __Default value__: 30000 (30 seconds)
+
+```jsx
+Spiderable.bufferSizeInBytes = 30 * 1000; // 30 seconds in minutes
+```
+
 ##### Response statuses
 You able to send any response status from phantomjs, this behavior may be easily controlled via special `HTML`/`JADE` comment:
  - `201` - `<!-- response:status-code=201 -->`
