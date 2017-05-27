@@ -22,20 +22,17 @@ spiderable-longer-timeout
  - [Original Spiderable documentation](#from-meteors-original-spiderable-documentation-see-notes-specific-to-this-branch-above)
 
 ### About
-This is a branch of the standard meteor `spiderable` package, with some merged code from
-`ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and
-size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
+This is a fork of the standard meteor `spiderable` package, with some merged code from `ongoworks:spiderable` package. Primarily, this lengthens the timeout to 30 seconds and size limit to 10MB. All results will be cached to Mongo collection, by default for 3 hours (180 minutes).
 
 This package will ignore all SSL error in favor of page fetching.
 
-This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers
-the package will return the same headers. This package also has support for [JavaScript redirects](#supported-redirects).
+This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers the package will return the same headers. This package also has support for [JavaScript redirects](#supported-redirects).
 
-This package tested with [iron-router](https://github.com/iron-meteor/iron-router) and [flow-router](https://github.com/kadirahq/flow-router), with and without next packages:
+This package tested with [iron-router](https://github.com/iron-meteor/iron-router), [flow-router](https://github.com/kadirahq/flow-router), and [flow-router-extra](https://github.com/VeliovGroup/flow-router) with and without next packages:
  - [fast-render](https://github.com/kadirahq/fast-render)
  - [subs-manager](https://github.com/kadirahq/subs-manager)
  - [appcache](https://github.com/meteor/meteor/wiki/AppCache)
- - [files](https://github.com/VeliovGroup/Meteor-Files)
+ - [meteor-files](https://github.com/VeliovGroup/Meteor-Files)
 
 This package has build-in caching mechanism, by default it stores results for 3 hours, to change storing period set `Spiderable.cacheLifetimeInMinutes` to other value in minutes.
 
@@ -50,9 +47,61 @@ import { Spiderable } from 'meteor/jazeee:spiderable-longer-timeout';
 ```
 
 #### Setup:
+##### `SPIDERABLE_FLAGS` environment variable
+Issues like [`select: Invalid argument`](https://github.com/VeliovGroup/jazeee-meteor-spiderable/issues/50) can be easily solved with additional `phantomjs` process flags (arguments).
+Default flags:
+```shell
+phantomjs --load-images=no --ssl-protocol=TLSv1 --ignore-ssl-errors=true --web-security=false
+```
+
+SSL/TLS issues:
+```shell
+SPIDERABLE_FLAGS="--ssl-protocol=any"
+```
+
+Caching - minor speed increase (make sure `/data/phantomjs` directory exists and writable):
+```shell
+SPIDERABLE_FLAGS="--disk-cache=true --disk-cache-path=/data/phantomjs"
+```
+
+Cookies and localStorage (make sure `/data/phantomjs` directory exists and writable):
+```shell
+SPIDERABLE_FLAGS="--cookies-file=/data/phantomjs/cookies.txt --local-storage-path=/data/phantomjs"
+```
+
+AppCache (make sure `/data/phantomjs` directory exists and writable):
+```shell
+SPIDERABLE_FLAGS="--offline-storage-path=/data/phantomjs"
+```
+
+XHR and parent <-> child window access:
+```shell
+SPIDERABLE_FLAGS="--local-to-remote-url-access=true"
+```
+
+All flags (make sure `/data/phantomjs` directory and `/data/phantomjs/cookies.txt` file exists and writable):
+```shell
+SPIDERABLE_FLAGS="--load-images=false --ssl-protocol=any --ignore-ssl-errors=true --disk-cache=true --disk-cache-path=/data/phantomjs --cookies-file=/data/phantomjs/cookies.txt --local-storage-path=/data/phantomjs --local-to-remote-url-access=true --offline-storage-path=/data/phantomjs --web-security=false"
+```
+
+Usage:
+```shell
+# To start process with env.var
+SPIDERABLE_FLAGS="--load-images=false --ssl-protocol=any --ignore-ssl-errors=true" meteor
+
+# Set temporary env.var
+export SPIDERABLE_FLAGS="--load-images=false --ssl-protocol=any --ignore-ssl-errors=true"
+```
+
+Within Phusion Passenger:
+```nginx
+server {
+  passenger_env_var SPIDERABLE_FLAGS "--load-images=false --ssl-protocol=any --ignore-ssl-errors=true";
+}
+```
+
 ##### isReadyForSpiderable {*Boolean*}
-On server and client this tells Spiderable that everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which allows for
-finer control about when content is ready to be published.
+On server and client, this instructs Spiderable that everything is ready. Spiderable will wait for `Meteor.isReadyForSpiderable` to be `true`, which allows for finer control about when content is ready to be published.
 ```jsx
 Router.onAfterAction( function () {
   if (this.ready()) {
@@ -63,26 +112,45 @@ Router.onAfterAction( function () {
 
 #### Options
 ##### userAgentRegExps {[*RegExp*]}
-Array of Regular Expressions, of bot's user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`.
-Optionally set or extend `Spiderable.userAgentRegExps` list.
+An array of Regular Expressions, of bot's user agents that we want to serve statically, but do not obey the `_escaped_fragment_ protocol`. Optionally set or extend `Spiderable.userAgentRegExps` list.
 ```jsx
 Spiderable.userAgentRegExps.push(/^vkShare/i);
 ```
 __Default Bots__:
- - `/facebookExternalHit/i`
- - `/linkedinBot/i`
- - `/twitterBot/i`
- - `/googleBot/i`
- - `/bingBot/i`
- - `/yandex/i`
+ - `/360spider/i`
+ - `/adsbot-google/i`
+ - `/ahrefsbot/i`
+ - `/applebot/i`
+ - `/baiduspider/i`
+ - `/bingbot/i`
+ - `/duckduckbot/i`
+ - `/facebookbot/i`
+ - `/facebookexternalhit/i`
  - `/google-structured-data-testing-tool/i`
+ - `/googlebot/i`
+ - `/instagram/i`
+ - `/kaz.kz_bot/i`
+ - `/linkedinbot/i`
+ - `/mail.ru_bot/i`
+ - `/mediapartners-google/i`
+ - `/mj12bot/i`
+ - `/msnbot/i`
+ - `/msrbot/i`
+ - `/oovoo/i`
+ - `/orangebot/i`
+ - `/pinterest/i`
+ - `/redditbot/i`
+ - `/sitelockspider/i`
+ - `/skypeuripreview/i`
+ - `/slackbot/i`
+ - `/sputnikbot/i`
+ - `/tweetmemebot/i`
+ - `/twitterbot/i`
+ - `/viber/i`
+ - `/vkshare/i`
+ - `/whatsapp/i`
  - `/yahoo/i`
- - `/MJ12Bot/i`
- - `/tweetmemeBot/i`
- - `/baiduSpider/i`
- - `/Mail\.RU_Bot/i`
- - `/ahrefsBot/i`
- - `/SiteLockSpider/`
+ - `/yandex/`
 
 ##### cacheLifetimeInMinutes (Cache TTL) {*Number*}
 How long cached Spiderable results should be stored (in minutes).
