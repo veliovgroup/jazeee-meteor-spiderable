@@ -28,6 +28,8 @@ This package will ignore all SSL error in favor of page fetching.
 
 This package supports "real response-code" and "real headers", this means if your route returns `301` response code with some headers the package will return the same headers. This package also has support for [JavaScript redirects](#supported-redirects).
 
+`phantomjs` and consequently this package doesn't support ES6 (ECMAScript 2015), if you're not compiling ES6 to ES5, or using NPM packages written in ES6 (*Meteor doesn't compile NPM packages*) it will result in blank pages after rendering. There is no easy way to solve it with drop-in package/solution. We recommend to solve it with [prerendering by ostr.io](https://ostr.io/info/prerendering), which has ES6 (ECMAScript 2015) support and can be installed with one command.
+
 This package tested with [iron-router](https://github.com/iron-meteor/iron-router), [flow-router](https://github.com/kadirahq/flow-router), and [flow-router-extra](https://github.com/VeliovGroup/flow-router) with and without next packages:
  - [fast-render](https://github.com/kadirahq/fast-render)
  - [subs-manager](https://github.com/kadirahq/subs-manager)
@@ -129,9 +131,9 @@ __Default Bots__:
  - `/google-structured-data-testing-tool/i`
  - `/googlebot/i`
  - `/instagram/i`
- - `/kaz.kz_bot/i`
+ - `/kaz\.kz_bot/i`
  - `/linkedinbot/i`
- - `/mail.ru_bot/i`
+ - `/mail\.ru_bot/i`
  - `/mediapartners-google/i`
  - `/mj12bot/i`
  - `/msnbot/i`

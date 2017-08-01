@@ -1,5 +1,5 @@
-import { _ } from 'meteor/underscore';
-import { HTTP } from 'meteor/http';
+import { _ }          from 'meteor/underscore';
+import { HTTP }       from 'meteor/http';
 import { Spiderable } from 'meteor/jazeee:spiderable-longer-timeout';
 
 Tinytest.add('phantom url generation', (test) => {
@@ -55,11 +55,7 @@ Tinytest.add('phantom url generation', (test) => {
     }
   ], (testCase) => {
     testCase.absUrl = testCase.absUrl || absUrl;
-
-    test.equal(
-      Spiderable._urlForPhantom(absUrl, testCase.requestUrl),
-      absUrl + testCase.expected
-    );
+    test.equal(Spiderable._urlForPhantom(absUrl, testCase.requestUrl), absUrl + testCase.expected);
   });
 });
 
